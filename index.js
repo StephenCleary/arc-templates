@@ -1,6 +1,6 @@
-import Template from './Template';
-import tokens from './tokens';
-import Lexer from './Lexer';
+import Template from './src/template';
+import tokens from './src/tokens';
+import Lexer from './src/lexer';
 
 class Arc {
     compile(text) {

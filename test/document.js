@@ -1,7 +1,7 @@
 import assert from 'assert';
-import Arc from '../src/index';
+import Arc from '../index';
 
-describe('doc context', () => {
+describe('document', () => {
     describe('plain string', () => {
         it('should return that string as the content', () => {
             const engine = new Arc();

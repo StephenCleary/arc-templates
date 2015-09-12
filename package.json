@@ -18,7 +18,7 @@
   "scripts": {
     "test": "mocha --bail --compilers js:babel/register"
   },
-  "main": "./src/index.js",
+  "main": "./index.js",
   "keywords": [
     "template",
     "layout",

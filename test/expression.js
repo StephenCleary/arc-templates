@@ -1,5 +1,5 @@
 import assert from 'assert';
-import Arc from '../src/index';
+import Arc from '../index';
 
 describe('expression', () => {
     describe('basic expression', () => {
