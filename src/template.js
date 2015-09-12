@@ -1,5 +1,16 @@
 import _ from 'lodash';
 
+class RawString {
+    constructor(value) {
+        this.value = value;
+    }
+
+    toString() {
+        return this.value;
+    }
+}
+
+
 /**
  * A compiled template.
  */
@@ -11,10 +22,22 @@ class Template {
             evaluate.call(this);
         };
         this.result = { content: '' };
+        this.locals = {
+            _: _,
+            raw: this.raw
+        };
     }
 
     append(str) {
-        this.result.content += str;
+        if (str instanceof RawString) {
+            this.result.content += str;
+        } else {
+            this.result.content += _.escape(str);
+        }
+    }
+
+    raw(str) {
+        return new RawString(str);
     }
 }
 

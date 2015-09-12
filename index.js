@@ -12,10 +12,10 @@ class Arc {
             }
             switch (token.token) {
                 case tokens.DOCUMENT:
-                    buffer.push('this.append(' + JSON.stringify(token.value) + ');');
+                    buffer.push('this.append(this.raw(' + JSON.stringify(token.value) + '));');
                     break;
                 case tokens.EXPRESSION:
-                    buffer.push('with (this.data) this.append(this._.escape(' + token.value + '));');
+                    buffer.push('with (this.locals) with (this.data) this.append(' + token.value + ');');
                     break;
                 default:
                     throw new Error("Internal error." + JSON.stringify(token));

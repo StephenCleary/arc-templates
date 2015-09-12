@@ -25,4 +25,12 @@ describe('expression', () => {
             assert.equal(result.content, '&lt;div&gt;');
         });
     });
+
+    describe('raw html expression', () => {
+        it('should return unescaped string as the content', () => {
+            const engine = new Arc();
+            const result = engine.parse('${raw(value)}', { value: '<div>'});
+            assert.equal(result.content, '<div>');
+        });
+    });
 });
