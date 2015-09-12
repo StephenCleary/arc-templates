@@ -33,4 +33,12 @@ describe('expression', () => {
             assert.equal(result.content, '<div>');
         });
     });
+
+    describe('expression within document', () => {
+        it('should merge evaluated expression with document text', () => {
+            const engine = new Arc();
+            const result = engine.parse('pre${ inject } post', { inject: 'word'});
+            assert.equal(result.content, 'preword post');
+        });
+    });
 });
