@@ -15,7 +15,7 @@ class Arc {
                     buffer.push('this.append(' + JSON.stringify(token.value) + ');');
                     break;
                 case tokens.EXPRESSION:
-                    buffer.push('with (this.data) this.append(' + token.value + ');');
+                    buffer.push('with (this.data) this.append(this._.escape(' + token.value + '));');
                     break;
                 default:
                     throw new Error("Internal error." + JSON.stringify(token));
@@ -26,7 +26,7 @@ class Arc {
 
     parse(text, data) {
         const template = new Template(this.compile(text));
-        template.execute(data);
+        template.execute(data || {});
         return template.result;
     }
 }

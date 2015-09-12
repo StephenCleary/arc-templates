@@ -1,9 +1,5 @@
+import _ from 'lodash';
 import tokens from './tokens';
-
-// Completely stolen from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
 
 const BEGIN_EXPRESSION = '${';
 const END_EXPRESSION = '}';
@@ -21,7 +17,7 @@ const BEGIN_LAYOUT = '{!';
 const END_LAYOUT = '!}';
 
 function regex(...values) {
-    return new RegExp(values.map(x => escapeRegExp(x)).join('|'), 'g');
+    return new RegExp(values.map(x => _.escapeRegExp(x)).join('|'), 'g');
 }
 
 const rootContextRegex = regex(BEGIN_EXPRESSION,
