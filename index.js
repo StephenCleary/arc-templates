@@ -5,7 +5,7 @@ import Lexer from './src/lexer';
 class Arc {
     compile(text) {
         const lexer = new Lexer(text);
-        const buffer = [];
+        const buffer = ['with (this.locals) with (this.data) {'];
         for (let token of lexer.root()) {
             if (token === null) {
                 continue;
@@ -15,7 +15,7 @@ class Arc {
                     buffer.push('this.append(this.raw(' + JSON.stringify(token.value) + '));');
                     break;
                 case tokens.EXPRESSION:
-                    buffer.push('with (this.locals) with (this.data) this.append(' + token.value + ');');
+                    buffer.push('this.append(' + token.value + ');');
                     break;
                 case tokens.JAVASCRIPT:
                     buffer.push(token.value);
@@ -24,6 +24,7 @@ class Arc {
                     throw new Error("Internal error." + JSON.stringify(token));
             }
         }
+        buffer.push('}');
         return new Function(buffer.join(''));
     }
 
