@@ -17,6 +17,9 @@ class Arc {
                 case tokens.EXPRESSION:
                     buffer.push('with (this.locals) with (this.data) this.append(' + token.value + ');');
                     break;
+                case tokens.JAVASCRIPT:
+                    buffer.push(token.value);
+                    break;
                 default:
                     throw new Error("Internal error." + JSON.stringify(token));
             }
