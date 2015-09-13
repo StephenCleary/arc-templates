@@ -11,6 +11,7 @@ class Arc {
     }
 
     compile(text) {
+        const nameOrExpression = value => value.trim().startsWith('(') ? value : JSON.stringify(value);
         const lexer = new Lexer(this, text);
         const buffer = ['with (this.locals) with (this.data) return Promise.resolve().then(function () {'];
         for (let token of lexer.root()) {
@@ -28,14 +29,10 @@ class Arc {
                     buffer.push(token.value);
                     break;
                 case tokens.LAYOUT:
-                    if (token.value.trim().startsWith('(')) {
-                        buffer.push('this.layout = ' + token.value + ';');
-                    } else {
-                        buffer.push('this.layout = ' + JSON.stringify(token.value) + ';');
-                    }
+                    buffer.push('this.layout = ' + nameOrExpression(token.value) + ';');
                     break;
                 default:
-                    throw new Error("Internal error." + JSON.stringify(token));
+                    throw new Error("Internal error.");
             }
         }
         buffer.push('}.bind(this));');
