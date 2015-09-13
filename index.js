@@ -2,10 +2,12 @@ import Template from './src/Template';
 import tokens from './src/tokens';
 import Lexer from './src/Lexer';
 import NodeFilesystem from './src/NodeFilesystem';
+import NodePath from './src/NodePath';
 
 class Arc {
-    constructor(filesystem) {
+    constructor(filesystem, path) {
         this.filesystem = filesystem || new NodeFilesystem();
+        this.path = path || new NodePath();
     }
 
     compile(text) {
