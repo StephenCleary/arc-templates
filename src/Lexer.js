@@ -35,16 +35,17 @@ const javascriptContextRegex = regex(END_JAVASCRIPT,
 const commentContextRegex = regex(BEGIN_COMMENT, END_COMMENT);
 
 class Lexer {
-    constructor(text) {
+    constructor(arc, text, filename) {
+        this.arc = arc;
         this.text = text;
         this.index = 0;
         this.lineIndex = 0;
         this.line = 1;
+        this.filename = filename || '<string>';
     }
 
     currentLocation() {
         return {
-            index: this.index,
             line: this.line,
             column: this.index - this.lineIndex + 1
         };
@@ -78,7 +79,7 @@ class Lexer {
     }
 
     locStr(loc) {
-        return JSON.stringify(loc);
+        return '(' + loc.line + ',' + loc.column + ')';
     }
 
     *comment() {
@@ -205,35 +206,40 @@ class Lexer {
     }
 
     *root() {
-        rootContextRegex.lastIndex = this.index;
-        while (true) {
-            const match = rootContextRegex.exec(this.text);
-            if (match === null) {
-                yield this.getToken(this.text.length, tokens.DOCUMENT, this.text.length);
-                return;
+        try {
+            rootContextRegex.lastIndex = this.index;
+            while (true) {
+                const match = rootContextRegex.exec(this.text);
+                if (match === null) {
+                    yield this.getToken(this.text.length, tokens.DOCUMENT, this.text.length);
+                    return;
+                }
+                yield this.getToken(rootContextRegex.lastIndex, tokens.DOCUMENT, match.index);
+                if (match[0] === BEGIN_EXPRESSION) {
+                    yield* this.expression();
+                    rootContextRegex.lastIndex = this.index;
+                } else if (match[0] === BEGIN_JAVASCRIPT) {
+                    yield* this.javascript();
+                    rootContextRegex.lastIndex = this.index;
+                } else if (match[0] === BEGIN_COMMENT) {
+                    yield* this.comment();
+                    rootContextRegex.lastIndex = this.index;
+                } else if (match[0] === BEGIN_BLOCK) {
+                    yield* this.block();
+                    rootContextRegex.lastIndex = this.index;
+                } else if (match[0] === BEGIN_BLOCK_REFERENCE) {
+                    yield* this.blockReference();
+                    rootContextRegex.lastIndex = this.index;
+                } else if (match[0] === BEGIN_LAYOUT) {
+                    yield* this.layout();
+                    rootContextRegex.lastIndex = this.index;
+                } else {
+                    throw new Error("Internal error.");
+                }
             }
-            yield this.getToken(rootContextRegex.lastIndex, tokens.DOCUMENT, match.index);
-            if (match[0] === BEGIN_EXPRESSION) {
-                yield* this.expression();
-                rootContextRegex.lastIndex = this.index;
-            } else if (match[0] === BEGIN_JAVASCRIPT) {
-                yield* this.javascript();
-                rootContextRegex.lastIndex = this.index;
-            } else if (match[0] === BEGIN_COMMENT) {
-                yield* this.comment();
-                rootContextRegex.lastIndex = this.index;
-            } else if (match[0] === BEGIN_BLOCK) {
-                yield* this.block();
-                rootContextRegex.lastIndex = this.index;
-            } else if (match[0] === BEGIN_BLOCK_REFERENCE) {
-                yield* this.blockReference();
-                rootContextRegex.lastIndex = this.index;
-            } else if (match[0] === BEGIN_LAYOUT) {
-                yield* this.layout();
-                rootContextRegex.lastIndex = this.index;
-            } else {
-                throw new Error("Internal error.");
-            }
+        } catch (err) {
+            err.message = this.filename + ' ' + this.locStr(this.currentLocation()) + ': ' + err.message;
+            throw err;
         }
     }
 }

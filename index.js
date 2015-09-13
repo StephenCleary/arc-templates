@@ -1,10 +1,15 @@
 import Template from './src/template';
 import tokens from './src/tokens';
-import Lexer from './src/lexer';
+import Lexer from './src/Lexer';
+import NodeFilesystem from './src/nodeFilesystem';
 
 class Arc {
+    constructor(filesystem) {
+        this.filesystem = filesystem || new NodeFilesystem();
+    }
+
     compile(text) {
-        const lexer = new Lexer(text);
+        const lexer = new Lexer(this, text);
         const buffer = ['with (this.locals) with (this.data) return Promise.resolve().then(function () {'];
         for (let token of lexer.root()) {
             if (token === null) {

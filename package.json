@@ -25,6 +25,7 @@
     "engine"
   ],
   "dependencies": {
+    "fs": "0.0.2",
     "lodash": "^3.10.1"
   }
 }
