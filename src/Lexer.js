@@ -34,13 +34,12 @@ const javascriptContextRegex = regex(END_JAVASCRIPT,
 const commentContextRegex = regex(BEGIN_COMMENT, END_COMMENT);
 
 class Lexer {
-    constructor(arc, text, filename) {
-        this.arc = arc;
+    constructor(text, filename) {
         this.text = text;
         this.index = 0;
         this.lineIndex = 0;
         this.line = 1;
-        this.filename = filename || '<string>';
+        this.filename = filename;
     }
 
     currentLocation() {
