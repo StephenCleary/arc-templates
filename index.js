@@ -1,7 +1,7 @@
-import Template from './src/tempTemplate';
+import Template from './src/Template';
 import tokens from './src/tokens';
 import Lexer from './src/Lexer';
-import NodeFilesystem from './src/tempNodeFilesystem';
+import NodeFilesystem from './src/NodeFilesystem';
 
 class Arc {
     constructor(filesystem) {
