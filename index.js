@@ -13,7 +13,7 @@ class Arc {
     }
 
     load(filename, data) {
-        return new Compiler(this, filename).load(filename);
+        return new Compiler(this, filename).load(data);
     }
 }
 

@@ -42,8 +42,8 @@ class Compiler {
         return template.execute(data || {});
     }
 
-    load(filename, data) {
-        return this.arc.filesystem.readFileAsync(filename).then(text => this.parse(text, data));
+    load(data) {
+        return this.arc.filesystem.readFileAsync(this.filename).then(text => this.parse(text, data));
     }
 }
 
