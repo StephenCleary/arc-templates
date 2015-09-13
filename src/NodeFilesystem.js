@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 class NodeFilesystem {
-    readFile(path) {
+    readFileAsync(path) {
         return new Promise((resolve, reject) => {
             fs.readFile(path, 'utf8', (err, data) => {
                 if (err) {
@@ -11,6 +11,10 @@ class NodeFilesystem {
                 }
             });
         });
+    }
+
+    readFileSync(path) {
+        return fs.readFileSync(path, 'utf8');
     }
 }
 
