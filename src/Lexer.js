@@ -21,13 +21,10 @@ function regex(...values) {
 }
 
 const rootContextRegex = regex(BEGIN_EXPRESSION,
-    BEGIN_JAVASCRIPT, BEGIN_COMMENT, BEGIN_BLOCK, BEGIN_BLOCK_REFERENCE, BEGIN_LAYOUT);
+    BEGIN_JAVASCRIPT, BEGIN_COMMENT, BEGIN_BLOCK_REFERENCE, BEGIN_BLOCK, BEGIN_LAYOUT);
 
 const documentContextRegex = regex(END_DOCUMENT, BEGIN_EXPRESSION,
-    BEGIN_JAVASCRIPT, BEGIN_COMMENT, BEGIN_BLOCK, BEGIN_BLOCK_REFERENCE);
-
-const blockContextRegex = regex(END_BLOCK, BEGIN_EXPRESSION,
-    BEGIN_JAVASCRIPT, BEGIN_COMMENT, BEGIN_BLOCK, BEGIN_BLOCK_REFERENCE);
+    BEGIN_JAVASCRIPT, BEGIN_COMMENT, BEGIN_BLOCK_REFERENCE);
 
 const javascriptContextRegex = regex(END_JAVASCRIPT,
     BEGIN_COMMENT, BEGIN_DOCUMENT);
@@ -192,9 +189,6 @@ class Lexer {
                 documentContextRegex.lastIndex = this.index;
             } else if (match[0] === BEGIN_COMMENT) {
                 yield* this.comment();
-                documentContextRegex.lastIndex = this.index;
-            } else if (match[0] === BEGIN_BLOCK) {
-                yield* this.block();
                 documentContextRegex.lastIndex = this.index;
             } else if (match[0] === BEGIN_BLOCK_REFERENCE) {
                 yield* this.blockReference();

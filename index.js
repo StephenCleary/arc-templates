@@ -1,6 +1,6 @@
 import Template from './src/template';
 import tokens from './src/tokens';
-import Lexer from './src/lexer';
+import Lexer from './src/Lexer';
 import NodeFilesystem from './src/nodeFilesystem';
 
 class Arc {
