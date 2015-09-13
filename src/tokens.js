@@ -4,5 +4,6 @@ export default Object.freeze({
     EXPRESSION: 2,
     LAYOUT: 3,
     BLOCK_REFERENCE: 4,
-    BLOCK_NAME: 5
+    PARTIAL: 5,
+    BLOCK_NAME: 6
 });

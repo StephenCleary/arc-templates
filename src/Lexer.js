@@ -15,16 +15,18 @@ const BEGIN_BLOCK_REFERENCE = '{$';
 const END_BLOCK_REFERENCE = '$}';
 const BEGIN_LAYOUT = '{!';
 const END_LAYOUT = '!}';
+const BEGIN_PARTIAL = '{(';
+const END_PARTIAL = ')}';
 
 function regex(...values) {
     return new RegExp(values.map(x => _.escapeRegExp(x)).join('|'), 'g');
 }
 
 const rootContextRegex = regex(BEGIN_EXPRESSION,
-    BEGIN_JAVASCRIPT, BEGIN_COMMENT, BEGIN_BLOCK_REFERENCE, BEGIN_BLOCK, BEGIN_LAYOUT);
+    BEGIN_JAVASCRIPT, BEGIN_COMMENT, BEGIN_BLOCK_REFERENCE, BEGIN_PARTIAL, BEGIN_BLOCK, BEGIN_LAYOUT);
 
 const documentContextRegex = regex(END_DOCUMENT, BEGIN_EXPRESSION,
-    BEGIN_JAVASCRIPT, BEGIN_COMMENT, BEGIN_BLOCK_REFERENCE);
+    BEGIN_JAVASCRIPT, BEGIN_COMMENT, BEGIN_BLOCK_REFERENCE, BEGIN_PARTIAL);
 
 const javascriptContextRegex = regex(END_JAVASCRIPT,
     BEGIN_COMMENT, BEGIN_DOCUMENT);
@@ -151,6 +153,15 @@ class Lexer {
         yield this.getToken(matchIndex + END_BLOCK_REFERENCE.length, tokens.BLOCK_REFERENCE, matchIndex);
     }
 
+    *partial() {
+        const openLocation = this.currentLocation();
+        const matchIndex = this.text.indexOf(END_PARTIAL, this.index);
+        if (matchIndex === -1) {
+            throw new Error('Partial tag opened at ' + this.locStr(openLocation) + ' missing closing tag ' + END_PARTIAL);
+        }
+        yield this.getToken(matchIndex + END_PARTIAL.length, tokens.PARTIAL, matchIndex);
+    }
+
     *block() {
         const openLocation = this.currentLocation();
 
@@ -193,6 +204,9 @@ class Lexer {
             } else if (match[0] === BEGIN_BLOCK_REFERENCE) {
                 yield* this.blockReference();
                 documentContextRegex.lastIndex = this.index;
+            } else if (match[0] === BEGIN_PARTIAL) {
+                yield* this.partial();
+                rootContextRegex.lastIndex = this.index;
             } else {
                 throw new Error("Internal error.");
             }
@@ -223,6 +237,9 @@ class Lexer {
                     rootContextRegex.lastIndex = this.index;
                 } else if (match[0] === BEGIN_BLOCK_REFERENCE) {
                     yield* this.blockReference();
+                    rootContextRegex.lastIndex = this.index;
+                } else if (match[0] === BEGIN_PARTIAL) {
+                    yield* this.partial();
                     rootContextRegex.lastIndex = this.index;
                 } else if (match[0] === BEGIN_LAYOUT) {
                     yield* this.layout();
