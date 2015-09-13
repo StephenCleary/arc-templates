@@ -19,7 +19,7 @@ class Template {
         this._ = _;
         this.execute = (data) => {
             this.data = data;
-            evaluate.call(this);
+            return evaluate.call(this).then(() => this.result);
         };
         this.result = { content: '' };
         this.locals = {
