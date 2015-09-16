@@ -29,7 +29,17 @@ describe('layout', () => {
 
         it('passes content to layout file', () => {
             const filesystem = {
-                readFileAsync: filename => Promise.resolve().then(() => '{$ content $}')
+                readFileAsync: filename => Promise.resolve().then(() => '{$ content $} container')
+            };
+            const engine = new Arc(filesystem);
+            return engine.parse('{! mylayout.html !} woot').then(result => {
+                assert.equal(result.content, ' woot container');
+            });
+        });
+
+        it('default content is "content"', () => {
+            const filesystem = {
+                readFileAsync: filename => Promise.resolve().then(() => '{$ $}')
             };
             const engine = new Arc(filesystem);
             return engine.parse('{! mylayout.html !} woot').then(result => {

@@ -4,8 +4,11 @@ import tokens from './tokens';
 
 const MISSING_FILENAME = '<string>';
 
-function nameOrExpression(value) {
+function nameOrExpression(value, defaultIfEmpty) {
     value = value.trim();
+    if (value === '') {
+        value = defaultIfEmpty;
+    }
     return value.startsWith('(') ? value : JSON.stringify(value);
 }
 
@@ -36,7 +39,10 @@ class Compiler {
                     buffer.push('this.layout = ' + nameOrExpression(token.value) + ';\n');
                     break;
                 case tokens.BLOCK_REFERENCE:
-                    buffer.push('this.append(this.raw(this.child[' + nameOrExpression(token.value) + ']));\n');
+                    buffer.push('this.append(this.raw(this.child[' + nameOrExpression(token.value, 'content') + ']));\n');
+                    break;
+                case tokens.BLOCK_NAME:
+                    buffer.push('this.currentBlock = ' + nameOrExpression(token.value) + ';\n');
                     break;
                 default:
                     throw new Error("Internal error.");
