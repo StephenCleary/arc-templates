@@ -17,6 +17,16 @@ describe('layout', () => {
             });
         });
 
+        it('has access to the same data', () => {
+            const filesystem = {
+                readFileAsync: filename => Promise.resolve().then(() => '${ west }')
+            };
+            const engine = new Arc(filesystem);
+            return engine.parse('{! mylayout.html !}', { west: 'yes' }).then(result => {
+                assert.equal(result.content, 'yes');
+            });
+        });
+
         it('passes content to layout file', () => {
             const filesystem = {
                 readFileAsync: filename => Promise.resolve().then(() => '{$ content $}')

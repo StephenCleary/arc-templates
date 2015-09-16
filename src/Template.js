@@ -21,7 +21,8 @@ class Template {
         this.compiler = compiler;
         this.evaluate = evaluate;
         this.child = child;
-        this.result = { content: '' };
+        this.result = { };
+        this.currentBlock = 'content';
         this.locals = {
             _: this._,
             raw: this.raw
@@ -40,10 +41,13 @@ class Template {
     }
 
     append(str) {
+        if (this.result[this.currentBlock] === undefined) {
+            this.result[this.currentBlock] = '';
+        }
         if (str instanceof RawString) {
-            this.result.content += str;
+            this.result[this.currentBlock] += str;
         } else {
-            this.result.content += _.escape(str);
+            this.result[this.currentBlock] += _.escape(str);
         }
     }
 
