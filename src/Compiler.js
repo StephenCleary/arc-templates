@@ -56,13 +56,13 @@ class Compiler {
     }
 
     parseSync(text, data, child) {
-        const template = new Template(this, new Function(this.compile(text)), child);
-        return template.executeSync(data || {});
+        const template = new Template(this, new Function(this.compile(text)), data, child);
+        return template.executeSync();
     }
 
     parse(text, data, child) {
-        const template = new Template(this, new Function(this.compile(text)), child);
-        return template.execute(data || {});
+        const template = new Template(this, new Function(this.compile(text)), data, child);
+        return template.execute();
     }
 
     loadSync(data, child) {

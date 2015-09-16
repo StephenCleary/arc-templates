@@ -16,10 +16,11 @@ class RawString {
  * A compiled template.
  */
 class Template {
-    constructor(compiler, evaluate, child) {
+    constructor(compiler, evaluate, data, child) {
         this._ = _;
         this.compiler = compiler;
         this.evaluate = evaluate;
+        this.data = data || {};
         this.child = child;
         this.result = { };
         this.currentBlock = 'content';
@@ -29,8 +30,7 @@ class Template {
         };
     }
 
-    executeSync(data) {
-        this.data = data;
+    executeSync() {
         this.evaluate();
         if (this.layout === undefined) {
             return this.result;
@@ -38,8 +38,7 @@ class Template {
         return new Compiler(this.compiler.arc, this.compiler.joinedPath(this.layout)).loadSync(this.data, this.result);
     }
 
-    execute(data) {
-        this.data = data;
+    execute() {
         return Promise.resolve().then(() => {
             this.evaluate();
             if (this.layout === undefined) {
