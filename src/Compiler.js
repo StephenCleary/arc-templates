@@ -44,6 +44,9 @@ class Compiler {
                 case tokens.BLOCK_NAME:
                     buffer.push('this.currentBlock = ' + nameOrExpression(token.value) + ';\n');
                     break;
+                case tokens.PARTIAL:
+                    buffer.push('this.partial(' + nameOrExpression(token.value) + ');\n');
+                    break;
                 default:
                     throw new Error("Internal error.");
             }
@@ -52,9 +55,19 @@ class Compiler {
         return buffer.join('');
     }
 
+    parseSync(text, data, child) {
+        const template = new Template(this, new Function(this.compile(text)), child);
+        return template.executeSync(data || {});
+    }
+
     parse(text, data, child) {
         const template = new Template(this, new Function(this.compile(text)), child);
         return template.execute(data || {});
+    }
+
+    loadSync(data, child) {
+        var text = this.arc.filesystem.readFileSync(this.filename);
+        return this.parseSync(text, data, child);
     }
 
     load(data, child) {

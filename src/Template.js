@@ -29,6 +29,15 @@ class Template {
         };
     }
 
+    executeSync(data) {
+        this.data = data;
+        this.evaluate();
+        if (this.layout === undefined) {
+            return this.result;
+        }
+        return new Compiler(this.compiler.arc, this.compiler.joinedPath(this.layout)).loadSync(this.data, this.result);
+    }
+
     execute(data) {
         this.data = data;
         return Promise.resolve().then(() => {
@@ -53,6 +62,10 @@ class Template {
 
     raw(str) {
         return new RawString(str);
+    }
+
+    partial(path) {
+        this.append(this.raw(new Compiler(this.compiler.arc, this.compiler.joinedPath(path)).loadSync(this.data).content));
     }
 }
 
