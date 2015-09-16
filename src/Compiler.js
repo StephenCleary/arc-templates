@@ -23,10 +23,7 @@ class Compiler {
     compile(text) {
         const lexer = new Lexer(text, this.filename);
         const buffer = ['with (this.locals) with (this.data) {\n'];
-        for (let token of lexer.root()) {
-            if (token === null) {
-                continue;
-            }
+        for (let token of lexer.lex()) {
             switch (token.token) {
                 case tokens.DOCUMENT:
                     buffer.push('this.appendRaw(' + JSON.stringify(token.value) + ');\n');

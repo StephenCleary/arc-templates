@@ -252,6 +252,14 @@ class Lexer {
             throw err;
         }
     }
+
+    *lex() {
+        for (let token of this.root()) {
+            if (token !== null) {
+                yield token;
+            }
+        }
+    }
 }
 
 export default Lexer;
