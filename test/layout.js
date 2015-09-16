@@ -12,8 +12,18 @@ describe('layout', () => {
                 })
             };
             const engine = new Arc(filesystem);
-            return engine.parse('{! mylayout.html !}').then(result => {
+            return engine.parse('{! ' + name + ' !}').then(result => {
                 assert.equal(result.content, 'test');
+            });
+        });
+
+        it('passes content to layout file', () => {
+            const filesystem = {
+                readFileAsync: filename => Promise.resolve().then(() => '{$ content $}')
+            };
+            const engine = new Arc(filesystem);
+            return engine.parse('{! mylayout.html !} woot').then(result => {
+                assert.equal(result.content, ' woot');
             });
         });
     });

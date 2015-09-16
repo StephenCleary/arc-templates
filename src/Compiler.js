@@ -4,6 +4,11 @@ import tokens from './tokens';
 
 const MISSING_FILENAME = '<string>';
 
+function nameOrExpression(value) {
+    value = value.trim();
+    return value.startsWith('(') ? value : JSON.stringify(value);
+}
+
 class Compiler {
     constructor(arc, filename) {
         this.arc = arc;
@@ -11,7 +16,6 @@ class Compiler {
     }
 
     compile(text) {
-        const nameOrExpression = value => value.startsWith('(') ? value : JSON.stringify(value);
         const lexer = new Lexer(text, this.filename);
         const buffer = ['with (this.locals) with (this.data) {\n'];
         for (let token of lexer.root()) {
@@ -29,7 +33,10 @@ class Compiler {
                     buffer.push(token.value);
                     break;
                 case tokens.LAYOUT:
-                    buffer.push('this.layout = ' + nameOrExpression(token.value.trim()) + ';\n');
+                    buffer.push('this.layout = ' + nameOrExpression(token.value) + ';\n');
+                    break;
+                case tokens.BLOCK_REFERENCE:
+                    buffer.push('this.append(this.raw(this.child[' + nameOrExpression(token.value) + ']));\n');
                     break;
                 default:
                     throw new Error("Internal error.");
@@ -39,13 +46,13 @@ class Compiler {
         return buffer.join('');
     }
 
-    parse(text, data) {
-        const template = new Template(this, new Function(this.compile(text)));
+    parse(text, data, child) {
+        const template = new Template(this, new Function(this.compile(text)), child);
         return template.execute(data || {});
     }
 
-    load(data) {
-        return this.arc.filesystem.readFileAsync(this.filename).then(text => this.parse(text, data));
+    load(data, child) {
+        return this.arc.filesystem.readFileAsync(this.filename).then(text => this.parse(text, data, child));
     }
 
     joinedPath(path) {
