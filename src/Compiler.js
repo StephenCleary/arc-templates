@@ -13,9 +13,11 @@ function nameOrExpression(value, defaultIfEmpty) {
 }
 
 class Compiler {
-    constructor(arc, filename) {
+    constructor(arc, filename, data, child) {
         this.arc = arc;
         this.filename = filename || MISSING_FILENAME;
+        this.data = data;
+        this.child = child;
     }
 
     compile(text) {
@@ -55,23 +57,23 @@ class Compiler {
         return buffer.join('');
     }
 
-    parseSync(text, data, child) {
-        const template = new Template(this, new Function(this.compile(text)), data, child);
+    parseSync(text) {
+        const template = new Template(this, new Function(this.compile(text)), this.data, this.child);
         return template.executeSync();
     }
 
-    parse(text, data, child) {
-        const template = new Template(this, new Function(this.compile(text)), data, child);
+    parse(text) {
+        const template = new Template(this, new Function(this.compile(text)), this.data, this.child);
         return template.execute();
     }
 
-    loadSync(data, child) {
+    loadSync() {
         var text = this.arc.filesystem.readFileSync(this.filename);
-        return this.parseSync(text, data, child);
+        return this.parseSync(text, this.data, this.child);
     }
 
-    load(data, child) {
-        return this.arc.filesystem.readFileAsync(this.filename).then(text => this.parse(text, data, child));
+    load() {
+        return this.arc.filesystem.readFileAsync(this.filename).then(text => this.parse(text, this.data, this.child));
     }
 
     joinedPath(path) {

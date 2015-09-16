@@ -35,7 +35,7 @@ class Template {
         if (this.layout === undefined) {
             return this.result;
         }
-        return new Compiler(this.compiler.arc, this.compiler.joinedPath(this.layout)).loadSync(this.data, this.result);
+        return new Compiler(this.compiler.arc, this.compiler.joinedPath(this.layout), this.data, this.result).loadSync();
     }
 
     execute() {
@@ -44,7 +44,7 @@ class Template {
             if (this.layout === undefined) {
                 return this.result;
             }
-            return new Compiler(this.compiler.arc, this.compiler.joinedPath(this.layout)).load(this.data, this.result);
+            return new Compiler(this.compiler.arc, this.compiler.joinedPath(this.layout), this.data, this.result).load();
         });
     }
 
@@ -69,7 +69,7 @@ class Template {
     }
 
     partial(path) {
-        this.appendRaw(new Compiler(this.compiler.arc, this.compiler.joinedPath(path)).loadSync(this.data).content);
+        this.appendRaw(new Compiler(this.compiler.arc, this.compiler.joinedPath(path), this.data).loadSync().content);
     }
 }
 
