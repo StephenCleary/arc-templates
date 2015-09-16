@@ -49,14 +49,19 @@ class Template {
         });
     }
 
-    append(str) {
+    appendRaw(str) {
         if (this.result[this.currentBlock] === undefined) {
-            this.result[this.currentBlock] = '';
-        }
-        if (str instanceof RawString) {
-            this.result[this.currentBlock] += str;
+            this.result[this.currentBlock] = str;
         } else {
-            this.result[this.currentBlock] += _.escape(str);
+            this.result[this.currentBlock] += str;
+        }
+    }
+
+    append(str) {
+        if (str instanceof RawString) {
+            this.appendRaw(str);
+        } else {
+            this.appendRaw(_.escape(str));
         }
     }
 
@@ -65,7 +70,7 @@ class Template {
     }
 
     partial(path) {
-        this.append(this.raw(new Compiler(this.compiler.arc, this.compiler.joinedPath(path)).loadSync(this.data).content));
+        this.appendRaw(new Compiler(this.compiler.arc, this.compiler.joinedPath(path)).loadSync(this.data).content);
     }
 }
 

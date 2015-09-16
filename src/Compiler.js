@@ -27,7 +27,7 @@ class Compiler {
             }
             switch (token.token) {
                 case tokens.DOCUMENT:
-                    buffer.push('this.append(this.raw(' + JSON.stringify(token.value) + '));\n');
+                    buffer.push('this.appendRaw(' + JSON.stringify(token.value) + ');\n');
                     break;
                 case tokens.EXPRESSION:
                     buffer.push('this.append(' + token.value + ');\n');
@@ -39,7 +39,7 @@ class Compiler {
                     buffer.push('this.layout = ' + nameOrExpression(token.value) + ';\n');
                     break;
                 case tokens.BLOCK_REFERENCE:
-                    buffer.push('this.append(this.raw(this.child[' + nameOrExpression(token.value, 'content') + ']));\n');
+                    buffer.push('this.appendRaw(this.child[' + nameOrExpression(token.value, 'content') + ']);\n');
                     break;
                 case tokens.BLOCK_NAME:
                     buffer.push('this.currentBlock = ' + nameOrExpression(token.value) + ';\n');
