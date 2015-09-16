@@ -46,5 +46,15 @@ describe('layout', () => {
                 assert.equal(result.content, ' woot');
             });
         });
+
+        it('passes named content blocks to layout file', () => {
+            const filesystem = {
+                readFileAsync: filename => Promise.resolve().then(() => '{$ bob $}')
+            };
+            const engine = new Arc(filesystem);
+            return engine.parse('{! mylayout.html !} woot {[ bob {< data >} ]}').then(result => {
+                assert.equal(result.content, ' data ');
+            });
+        });
     });
 });

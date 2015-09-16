@@ -168,7 +168,7 @@ class Lexer {
         if (matchIndex === -1) {
             throw new Error('Block tag opened at ' + this.locStr(openLocation) + ' missing opening document tag ' + BEGIN_DOCUMENT);
         }
-        yield this.getToken(matchIndex + BEGIN_DOCUMENT, tokens.BLOCK_NAME, matchIndex);
+        yield this.getToken(matchIndex + BEGIN_DOCUMENT.length, tokens.BLOCK_NAME, matchIndex);
 
         yield* this.document();
 
@@ -176,7 +176,7 @@ class Lexer {
         if (matchIndex === -1) {
             throw new Error('Block tag opened at ' + this.locStr(openLocation) + ' missing closing tag ' + END_BLOCK);
         }
-        this.moveForward(matchIndex);
+        this.moveForward(matchIndex + END_BLOCK.length);
     }
 
     *document() {
