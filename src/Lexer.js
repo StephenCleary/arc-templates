@@ -140,7 +140,7 @@ class Lexer {
         if (matchIndex === -1) {
             throw new Error('Layout tag opened at ' + this.locStr(openLocation) + ' missing closing tag ' + END_LAYOUT);
         }
-        yield this.getToken(matchIndex + END_LAYOUT, tokens.LAYOUT, matchIndex);
+        yield this.getToken(matchIndex + END_LAYOUT.length, tokens.LAYOUT, matchIndex);
     }
 
     *blockReference() {

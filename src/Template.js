@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Compiler from './Compiler';
 
 class RawString {
     constructor(value) {
@@ -15,17 +16,26 @@ class RawString {
  * A compiled template.
  */
 class Template {
-    constructor(evaluate) {
+    constructor(compiler, evaluate) {
         this._ = _;
-        this.execute = (data) => {
-            this.data = data;
-            return evaluate.call(this).then(() => this.result);
-        };
+        this.compiler = compiler;
+        this._evaluate = evaluate;
         this.result = { content: '' };
         this.locals = {
-            _: _,
+            _: this._,
             raw: this.raw
         };
+    }
+
+    execute(data) {
+        this.data = data;
+        return Promise.resolve().then(() => {
+            this._evaluate();
+            if (this.layout === undefined) {
+                return this.result;
+            }
+            return new Compiler(this.compiler.arc, this.compiler.joinedPath(this.layout)).load(this.data);
+        });
     }
 
     append(str) {
