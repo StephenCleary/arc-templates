@@ -4,20 +4,26 @@ import tokens from './tokens';
 
 const MISSING_FILENAME = '<string>';
 
-function nameOrExpression(value, defaultIfEmpty) {
-    value = value.trim();
-    if (value === '') {
-        value = defaultIfEmpty;
-    }
-    return value.startsWith('(') ? value : JSON.stringify(value);
-}
-
 class Compiler {
     constructor(arc, filename, data, child) {
         this.arc = arc;
         this.filename = filename || MISSING_FILENAME;
         this.data = data;
         this.child = child;
+    }
+
+    nameOrExpression(token, defaultIfEmpty) {
+        let value = token.value.trim();
+        if (value === '') {
+            if (defaultIfEmpty !== undefined) {
+                value = defaultIfEmpty;
+            } else {
+                // TODO: factor this (and similar code in Lexer) out.
+                // Or move this check into Lexer.getToken?
+                throw new Error(this.filename + ' (' + token.begin.line + ',' + token.begin.column + '): ' + token.token + ' tag must contain a name or expression.');
+            }
+        }
+        return value.startsWith('(') ? value : JSON.stringify(value);
     }
 
     compile(text) {
@@ -35,16 +41,16 @@ class Compiler {
                     buffer.push(token.value);
                     break;
                 case tokens.LAYOUT:
-                    buffer.push('this.layout = ' + nameOrExpression(token.value) + ';\n');
+                    buffer.push('this.layout = ' + this.nameOrExpression(token) + ';\n');
                     break;
                 case tokens.BLOCK_REFERENCE:
-                    buffer.push('this.appendRaw(this.child[' + nameOrExpression(token.value, 'content') + ']);\n');
+                    buffer.push('this.appendRaw(this.child[' + this.nameOrExpression(token, 'content') + ']);\n');
                     break;
                 case tokens.BLOCK_NAME:
-                    buffer.push('this.currentBlock = ' + nameOrExpression(token.value) + ';\n');
+                    buffer.push('this.currentBlock = ' + this.nameOrExpression(token) + ';\n');
                     break;
                 case tokens.PARTIAL:
-                    buffer.push('this.partial(' + nameOrExpression(token.value) + ');\n');
+                    buffer.push('this.partial(' + this.nameOrExpression(token) + ');\n');
                     break;
                 default:
                     throw new Error("Internal error.");

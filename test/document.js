@@ -28,4 +28,13 @@ describe('document', () => {
             });
         });
     });
+
+    describe('empty', () => {
+        it('should return empty content', () => {
+            const engine = new Arc();
+            return engine.parse('').then(result => {
+                assert.equal(result.content, '');
+            });
+        });
+    });
 });

@@ -60,10 +60,18 @@ class Lexer {
         this.index = toIndex;
     }
 
+    // TODO: Remove token values that aren't actually used (.end, etc).
     getToken(newIndex, token, matchIndex) {
         if (this.index === matchIndex) {
-            this.index = newIndex;
-            return null;
+            switch (token) {
+                case tokens.DOCUMENT:
+                    this.index = newIndex;
+                    return null;
+                case tokens.BLOCK_REFERENCE:
+                    break;
+                default:
+                    throw new Error(token + ' tag cannot be empty.');
+            }
         }
 
         const result = {

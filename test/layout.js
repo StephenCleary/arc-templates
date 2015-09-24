@@ -49,6 +49,16 @@ describe('layout', () => {
             });
         });
 
+        it('block reference tag can be empty', () => {
+            const filesystem = {
+                readFileAsync: filename => Promise.resolve().then(() => '<**>')
+            };
+            const engine = new Arc(filesystem);
+            return engine.parse('<! mylayout.html !> woot').then(result => {
+                assert.equal(result.content, ' woot');
+            });
+        });
+
         it('passes named content blocks to layout file', () => {
             const filesystem = {
                 readFileAsync: filename => Promise.resolve().then(() => '<* bob *>')

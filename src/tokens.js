@@ -1,9 +1,9 @@
 export default Object.freeze({
-    DOCUMENT: 0,
-    JAVASCRIPT: 1,
-    EXPRESSION: 2,
-    LAYOUT: 3,
-    BLOCK_REFERENCE: 4,
-    PARTIAL: 5,
-    BLOCK_NAME: 6
+    DOCUMENT: 'Document',
+    JAVASCRIPT: 'JavaScript',
+    EXPRESSION: 'Expression',
+    LAYOUT: 'Layout',
+    BLOCK_REFERENCE: 'Block Reference',
+    PARTIAL: 'Partial',
+    BLOCK_NAME: 'Named Block'
 });

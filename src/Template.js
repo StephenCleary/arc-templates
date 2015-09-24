@@ -22,7 +22,9 @@ class Template {
         this.evaluate = evaluate;
         this.data = data || {};
         this.child = child;
-        this.result = { };
+        this.result = {
+            content: ''
+        };
         this.currentBlock = 'content';
         this.locals = {
             _: this._,
