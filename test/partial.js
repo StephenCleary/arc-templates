@@ -12,7 +12,7 @@ describe('partial', () => {
                 }
             };
             const engine = new Arc(filesystem);
-            return engine.parse('{( ' + name + ' )}').then(result => {
+            return engine.parse('<( ' + name + ' )>').then(result => {
                 assert.equal(result.content, 'test');
             });
         });

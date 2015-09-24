@@ -3,20 +3,20 @@ import tokens from './tokens';
 
 const BEGIN_EXPRESSION = '${';
 const END_EXPRESSION = '}';
-const BEGIN_JAVASCRIPT = '{%';
-const END_JAVASCRIPT = '%}';
-const BEGIN_COMMENT = '{/';
-const END_COMMENT = '/}';
-const BEGIN_BLOCK = '{[';
-const END_BLOCK = ']}';
-const BEGIN_DOCUMENT = '{<';
-const END_DOCUMENT = '>}';
-const BEGIN_BLOCK_REFERENCE = '{$';
-const END_BLOCK_REFERENCE = '$}';
-const BEGIN_LAYOUT = '{!';
-const END_LAYOUT = '!}';
-const BEGIN_PARTIAL = '{(';
-const END_PARTIAL = ')}';
+const BEGIN_JAVASCRIPT = '<%';
+const END_JAVASCRIPT = '%>';
+const BEGIN_COMMENT = '</*';
+const END_COMMENT = '*/>';
+const BEGIN_BLOCK = '<[';
+const END_BLOCK = ']>';
+const BEGIN_DOCUMENT = '<:';
+const END_DOCUMENT = ':>';
+const BEGIN_BLOCK_REFERENCE = '<*';
+const END_BLOCK_REFERENCE = '*>';
+const BEGIN_LAYOUT = '<!';
+const END_LAYOUT = '!>';
+const BEGIN_PARTIAL = '<(';
+const END_PARTIAL = ')>';
 
 function regex(...values) {
     return new RegExp(values.map(x => _.escapeRegExp(x)).join('|'), 'g');
