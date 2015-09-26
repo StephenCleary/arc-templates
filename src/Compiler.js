@@ -18,9 +18,7 @@ class Compiler {
             if (defaultIfEmpty !== undefined) {
                 value = defaultIfEmpty;
             } else {
-                // TODO: factor this (and similar code in Lexer) out.
-                // Or move this check into Lexer.getToken?
-                throw new Error(this.filename + ' (' + token.begin.line + ',' + token.begin.column + '): ' + token.token + ' tag must contain a name or expression.');
+                throw new Error(token.begin + ': ' + token.token + ' tag must contain a name or expression.');
             }
         }
         return value.startsWith('(') ? value : JSON.stringify(value);

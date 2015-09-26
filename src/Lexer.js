@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import tokens from './tokens';
+import Location from './Location';
 
 const BEGIN_EXPRESSION = '${';
 const END_EXPRESSION = '}';
@@ -43,10 +44,7 @@ class Lexer {
     }
 
     currentLocation() {
-        return {
-            line: this.line,
-            column: this.index - this.lineIndex + 1
-        };
+        return new Location(this.filename, this.line, this.index - this.lineIndex + 1);
     }
 
     moveForward(toIndex, str) {
@@ -84,10 +82,6 @@ class Lexer {
         return result;
     }
 
-    locStr(loc) {
-        return '(' + loc.line + ',' + loc.column + ')';
-    }
-
     *comment() {
         const openLocation = this.currentLocation();
         this.index += BEGIN_COMMENT.length;
@@ -95,7 +89,7 @@ class Lexer {
         while (true) {
             const match = commentContextRegex.exec(this.text);
             if (match === null) {
-                throw new Error('Comment tag opened at ' + this.locStr(openLocation) + ' missing closing tag ' + END_COMMENT);
+                throw new Error('Comment tag opened at ' + openLocation.locationString() + ' missing closing tag ' + END_COMMENT);
             }
             this.moveForward(commentContextRegex.lastIndex);
             if (match[0] === END_COMMENT) {
@@ -115,7 +109,7 @@ class Lexer {
         while (true) {
             const match = javascriptContextRegex.exec(this.text);
             if (match === null) {
-                throw new Error('Javascript tag opened at ' + this.locStr(openLocation) + ' missing closing tag ' + END_JAVASCRIPT);
+                throw new Error('Javascript tag opened at ' + openLocation.locationString() + ' missing closing tag ' + END_JAVASCRIPT);
             }
             yield this.getToken(javascriptContextRegex.lastIndex, tokens.JAVASCRIPT, match.index);
             if (match[0] === END_JAVASCRIPT) {
@@ -137,7 +131,7 @@ class Lexer {
         const openLocation = this.currentLocation();
         const matchIndex = this.text.indexOf(END_EXPRESSION, this.index);
         if (matchIndex === -1) {
-            throw new Error('Expression tag opened at ' + this.locStr(openLocation) + ' missing closing tag ' + END_EXPRESSION);
+            throw new Error('Expression tag opened at ' + openLocation.locationString() + ' missing closing tag ' + END_EXPRESSION);
         }
         yield this.getToken(matchIndex + END_EXPRESSION.length, tokens.EXPRESSION, matchIndex);
     }
@@ -146,7 +140,7 @@ class Lexer {
         const openLocation = this.currentLocation();
         const matchIndex = this.text.indexOf(END_LAYOUT, this.index);
         if (matchIndex === -1) {
-            throw new Error('Layout tag opened at ' + this.locStr(openLocation) + ' missing closing tag ' + END_LAYOUT);
+            throw new Error('Layout tag opened at ' + openLocation.locationString() + ' missing closing tag ' + END_LAYOUT);
         }
         yield this.getToken(matchIndex + END_LAYOUT.length, tokens.LAYOUT, matchIndex);
     }
@@ -155,7 +149,7 @@ class Lexer {
         const openLocation = this.currentLocation();
         const matchIndex = this.text.indexOf(END_BLOCK_REFERENCE, this.index);
         if (matchIndex === -1) {
-            throw new Error('Block Reference tag opened at ' + this.locStr(openLocation) + ' missing closing tag ' + END_BLOCK_REFERENCE);
+            throw new Error('Block Reference tag opened at ' + openLocation.locationString() + ' missing closing tag ' + END_BLOCK_REFERENCE);
         }
         yield this.getToken(matchIndex + END_BLOCK_REFERENCE.length, tokens.BLOCK_REFERENCE, matchIndex);
     }
@@ -164,7 +158,7 @@ class Lexer {
         const openLocation = this.currentLocation();
         const matchIndex = this.text.indexOf(END_PARTIAL, this.index);
         if (matchIndex === -1) {
-            throw new Error('Partial tag opened at ' + this.locStr(openLocation) + ' missing closing tag ' + END_PARTIAL);
+            throw new Error('Partial tag opened at ' + openLocation.locationString() + ' missing closing tag ' + END_PARTIAL);
         }
         yield this.getToken(matchIndex + END_PARTIAL.length, tokens.PARTIAL, matchIndex);
     }
@@ -174,7 +168,7 @@ class Lexer {
 
         let matchIndex = this.text.indexOf(BEGIN_DOCUMENT, this.index);
         if (matchIndex === -1) {
-            throw new Error('Block tag opened at ' + this.locStr(openLocation) + ' missing opening document tag ' + BEGIN_DOCUMENT);
+            throw new Error('Block tag opened at ' + openLocation.locationString() + ' missing opening document tag ' + BEGIN_DOCUMENT);
         }
         yield this.getToken(matchIndex + BEGIN_DOCUMENT.length, tokens.BLOCK_NAME, matchIndex);
 
@@ -182,7 +176,7 @@ class Lexer {
 
         matchIndex = this.text.indexOf(END_BLOCK, this.index);
         if (matchIndex === -1) {
-            throw new Error('Block tag opened at ' + this.locStr(openLocation) + ' missing closing tag ' + END_BLOCK);
+            throw new Error('Block tag opened at ' + openLocation.locationString() + ' missing closing tag ' + END_BLOCK);
         }
         this.moveForward(matchIndex + END_BLOCK.length);
     }
@@ -193,7 +187,7 @@ class Lexer {
         while (true) {
             const match = documentContextRegex.exec(this.text);
             if (match === null) {
-                throw new Error('Document tag opened at ' + this.locStr(openLocation) + ' missing closing tag ' + END_DOCUMENT);
+                throw new Error('Document tag opened at ' + openLocation.locationString() + ' missing closing tag ' + END_DOCUMENT);
             }
             yield this.getToken(documentContextRegex.lastIndex, tokens.DOCUMENT, match.index);
             if (match[0] === END_DOCUMENT) {
@@ -221,51 +215,51 @@ class Lexer {
     }
 
     *root() {
-        try {
-            rootContextRegex.lastIndex = this.index;
-            while (true) {
-                const match = rootContextRegex.exec(this.text);
-                if (match === null) {
-                    yield this.getToken(this.text.length, tokens.DOCUMENT, this.text.length);
-                    return;
-                }
-                yield this.getToken(rootContextRegex.lastIndex, tokens.DOCUMENT, match.index);
-                if (match[0] === BEGIN_EXPRESSION) {
-                    yield* this.expression();
-                    rootContextRegex.lastIndex = this.index;
-                } else if (match[0] === BEGIN_JAVASCRIPT) {
-                    yield* this.javascript();
-                    rootContextRegex.lastIndex = this.index;
-                } else if (match[0] === BEGIN_COMMENT) {
-                    yield* this.comment();
-                    rootContextRegex.lastIndex = this.index;
-                } else if (match[0] === BEGIN_BLOCK) {
-                    yield* this.block();
-                    rootContextRegex.lastIndex = this.index;
-                } else if (match[0] === BEGIN_BLOCK_REFERENCE) {
-                    yield* this.blockReference();
-                    rootContextRegex.lastIndex = this.index;
-                } else if (match[0] === BEGIN_PARTIAL) {
-                    yield* this.partial();
-                    rootContextRegex.lastIndex = this.index;
-                } else if (match[0] === BEGIN_LAYOUT) {
-                    yield* this.layout();
-                    rootContextRegex.lastIndex = this.index;
-                } else {
-                    throw new Error("Internal error.");
-                }
+        rootContextRegex.lastIndex = this.index;
+        while (true) {
+            const match = rootContextRegex.exec(this.text);
+            if (match === null) {
+                yield this.getToken(this.text.length, tokens.DOCUMENT, this.text.length);
+                return;
             }
-        } catch (err) {
-            err.message = this.filename + ' ' + this.locStr(this.currentLocation()) + ': ' + err.message;
-            throw err;
+            yield this.getToken(rootContextRegex.lastIndex, tokens.DOCUMENT, match.index);
+            if (match[0] === BEGIN_EXPRESSION) {
+                yield* this.expression();
+                rootContextRegex.lastIndex = this.index;
+            } else if (match[0] === BEGIN_JAVASCRIPT) {
+                yield* this.javascript();
+                rootContextRegex.lastIndex = this.index;
+            } else if (match[0] === BEGIN_COMMENT) {
+                yield* this.comment();
+                rootContextRegex.lastIndex = this.index;
+            } else if (match[0] === BEGIN_BLOCK) {
+                yield* this.block();
+                rootContextRegex.lastIndex = this.index;
+            } else if (match[0] === BEGIN_BLOCK_REFERENCE) {
+                yield* this.blockReference();
+                rootContextRegex.lastIndex = this.index;
+            } else if (match[0] === BEGIN_PARTIAL) {
+                yield* this.partial();
+                rootContextRegex.lastIndex = this.index;
+            } else if (match[0] === BEGIN_LAYOUT) {
+                yield* this.layout();
+                rootContextRegex.lastIndex = this.index;
+            } else {
+                throw new Error("Internal error.");
+            }
         }
     }
 
     *lex() {
-        for (let token of this.root()) {
-            if (token !== null) {
-                yield token;
+        try {
+            for (let token of this.root()) {
+                if (token !== null) {
+                    yield token;
+                }
             }
+        } catch (err) {
+            err.message = this.currentLocation() + ': ' + err.message;
+            throw err;
         }
     }
 }
