@@ -1,20 +1,11 @@
 import fs from 'fs';
+import Promise from 'bluebird';
+
+const readFileAsync = Promise.promisify(fs.readFile);
 
 class NodeFilesystem {
-    readFileAsync(path) {
-        return new Promise((resolve, reject) => {
-            fs.readFile(path, 'utf8', (err, data) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(data);
-                }
-            });
-        });
-    }
-
-    readFileSync(path) {
-        return fs.readFileSync(path, 'utf8');
+    readFile(path) {
+        return readFileAsync(path, 'utf8');
     }
 }
 

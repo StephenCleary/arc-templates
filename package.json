@@ -25,6 +25,7 @@
     "engine"
   ],
   "dependencies": {
+    "bluebird": "^2.10.1",
     "fs": "0.0.2",
     "lodash": "^3.10.1",
     "path": "^0.12.7"

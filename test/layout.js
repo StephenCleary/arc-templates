@@ -6,7 +6,7 @@ describe('layout', () => {
         it('loads layout file asynchronously', () => {
             const name = 'mylayout.html';
             const filesystem = {
-                readFileAsync: filename => Promise.resolve().then(() => {
+                readFile: filename => Promise.resolve().then(() => {
                     assert.equal(filename, name);
                     return 'test';
                 })
@@ -19,7 +19,7 @@ describe('layout', () => {
 
         it('has access to the same data', () => {
             const filesystem = {
-                readFileAsync: filename => Promise.resolve().then(() => '${ west }')
+                readFile: filename => Promise.resolve('${ west }')
             };
             const engine = new Arc(filesystem);
             return engine.parse('<! mylayout.html !>', {west: 'yes'}).then(result => {
@@ -29,7 +29,7 @@ describe('layout', () => {
 
         it('passes content to layout file', () => {
             const filesystem = {
-                readFileAsync: filename => Promise.resolve().then(() => '<* content *> container')
+                readFile: filename => Promise.resolve('<* content *> container')
             };
             const engine = new Arc(filesystem);
             return engine.parse('<! mylayout.html !> woot').then(result => {
@@ -41,7 +41,7 @@ describe('layout', () => {
     describe('contents', () => {
         it('default content is "content"', () => {
             const filesystem = {
-                readFileAsync: filename => Promise.resolve().then(() => '<* *>')
+                readFile: filename => Promise.resolve('<* *>')
             };
             const engine = new Arc(filesystem);
             return engine.parse('<! mylayout.html !> woot').then(result => {
@@ -51,7 +51,7 @@ describe('layout', () => {
 
         it('block reference tag can be empty', () => {
             const filesystem = {
-                readFileAsync: filename => Promise.resolve().then(() => '<**>')
+                readFile: filename => Promise.resolve('<**>')
             };
             const engine = new Arc(filesystem);
             return engine.parse('<! mylayout.html !> woot').then(result => {
@@ -61,7 +61,7 @@ describe('layout', () => {
 
         it('passes named content blocks to layout file', () => {
             const filesystem = {
-                readFileAsync: filename => Promise.resolve().then(() => '<* bob *>')
+                readFile: filename => Promise.resolve('<* bob *>')
             };
             const engine = new Arc(filesystem);
             return engine.parse('<! mylayout.html !> woot <[ bob <: data :> ]>').then(result => {

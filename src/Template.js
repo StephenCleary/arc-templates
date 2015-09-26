@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import Compiler from './Compiler';
+import Promise from 'bluebird';
 
 class RawString {
     constructor(value) {
@@ -11,7 +12,6 @@ class RawString {
     }
 }
 
-
 /**
  * A compiled template.
  */
@@ -19,7 +19,7 @@ class Template {
     constructor(compiler, evaluate, data, child) {
         this._ = _;
         this._compiler = compiler;
-        this._evaluate = evaluate;
+        this._evaluate = Promise.coroutine(evaluate);
         this.data = data || {};
         this.child = child;
         this._result = {
@@ -32,17 +32,8 @@ class Template {
         };
     }
 
-    _executeSync() {
-        this._evaluate();
-        if (this._layout === undefined) {
-            return this._result;
-        }
-        return new Compiler(this._compiler.arc, this._compiler.joinedPath(this._layout), this.data, this._result).loadSync();
-    }
-
     _execute() {
-        return Promise.resolve().then(() => {
-            this._evaluate();
+        return this._evaluate().then(() => {
             if (this._layout === undefined) {
                 return this._result;
             }
@@ -71,7 +62,7 @@ class Template {
     }
 
     _partial(path) {
-        this._appendRaw(new Compiler(this._compiler.arc, this._compiler.joinedPath(path), this.data).loadSync().content);
+        return new Compiler(this._compiler.arc, this._compiler.joinedPath(path), this.data).load();
     }
 }
 

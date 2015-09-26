@@ -3,6 +3,7 @@ import Template from './Template';
 import tokens from './tokens';
 
 const MISSING_FILENAME = '<string>';
+const globalEval = eval;
 
 class Compiler {
     constructor(arc, filename, data, child) {
@@ -48,7 +49,8 @@ class Compiler {
                     buffer.push('this._currentBlock = ' + this.nameOrExpression(token) + ';\n');
                     break;
                 case tokens.PARTIAL:
-                    buffer.push('this._partial(' + this.nameOrExpression(token) + ');\n');
+                    buffer.push('this._locals.partial = yield this._partial(' + this.nameOrExpression(token) + ');\n');
+                    buffer.push('this._appendRaw(this._locals.partial.content);\n');
                     break;
                 default:
                     throw new Error("Internal error.");
@@ -58,23 +60,15 @@ class Compiler {
         return buffer.join('');
     }
 
-    parseSync(text) {
-        const template = new Template(this, new Function(this.compile(text)), this.data, this.child);
-        return template._executeSync();
-    }
-
     parse(text) {
-        const template = new Template(this, new Function(this.compile(text)), this.data, this.child);
+        // As much as I dislike eval, GeneratorFunction doesn't seem to be working yet.
+        const func = globalEval('(function *() { ' + this.compile(text) + ' })');
+        const template = new Template(this, func, this.data, this.child);
         return template._execute();
     }
 
-    loadSync() {
-        var text = this.arc.filesystem.readFileSync(this.filename);
-        return this.parseSync(text, this.data, this.child);
-    }
-
     load() {
-        return this.arc.filesystem.readFileAsync(this.filename).then(text => this.parse(text, this.data, this.child));
+        return this.arc.filesystem.readFile(this.filename).then(text => this.parse(text, this.data, this.child));
     }
 
     joinedPath(path) {
