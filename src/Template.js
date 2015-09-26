@@ -18,51 +18,51 @@ class RawString {
 class Template {
     constructor(compiler, evaluate, data, child) {
         this._ = _;
-        this.compiler = compiler;
-        this.evaluate = evaluate;
+        this._compiler = compiler;
+        this._evaluate = evaluate;
         this.data = data || {};
         this.child = child;
-        this.result = {
+        this._result = {
             content: ''
         };
-        this.currentBlock = 'content';
-        this.locals = {
+        this._currentBlock = 'content';
+        this._locals = {
             _: this._,
             raw: this.raw
         };
     }
 
-    executeSync() {
-        this.evaluate();
-        if (this.layout === undefined) {
-            return this.result;
+    _executeSync() {
+        this._evaluate();
+        if (this._layout === undefined) {
+            return this._result;
         }
-        return new Compiler(this.compiler.arc, this.compiler.joinedPath(this.layout), this.data, this.result).loadSync();
+        return new Compiler(this._compiler.arc, this._compiler.joinedPath(this._layout), this.data, this._result).loadSync();
     }
 
-    execute() {
+    _execute() {
         return Promise.resolve().then(() => {
-            this.evaluate();
-            if (this.layout === undefined) {
-                return this.result;
+            this._evaluate();
+            if (this._layout === undefined) {
+                return this._result;
             }
-            return new Compiler(this.compiler.arc, this.compiler.joinedPath(this.layout), this.data, this.result).load();
+            return new Compiler(this._compiler.arc, this._compiler.joinedPath(this._layout), this.data, this._result).load();
         });
     }
 
-    appendRaw(str) {
-        if (this.result[this.currentBlock] === undefined) {
-            this.result[this.currentBlock] = str;
+    _appendRaw(str) {
+        if (this._result[this._currentBlock] === undefined) {
+            this._result[this._currentBlock] = str;
         } else {
-            this.result[this.currentBlock] += str;
+            this._result[this._currentBlock] += str;
         }
     }
 
-    append(str) {
+    _append(str) {
         if (str instanceof RawString) {
-            this.appendRaw(str);
+            this._appendRaw(str);
         } else {
-            this.appendRaw(_.escape(str));
+            this._appendRaw(_.escape(str));
         }
     }
 
@@ -70,8 +70,8 @@ class Template {
         return new RawString(str);
     }
 
-    partial(path) {
-        this.appendRaw(new Compiler(this.compiler.arc, this.compiler.joinedPath(path), this.data).loadSync().content);
+    _partial(path) {
+        this._appendRaw(new Compiler(this._compiler.arc, this._compiler.joinedPath(path), this.data).loadSync().content);
     }
 }
 

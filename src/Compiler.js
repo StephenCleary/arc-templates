@@ -26,29 +26,29 @@ class Compiler {
 
     compile(text) {
         const lexer = new Lexer(text, this.filename);
-        const buffer = ['with (this.locals) with (this.data) {\n'];
+        const buffer = ['with (this._locals) with (this.data) {\n'];
         for (let token of lexer.lex()) {
             switch (token.token) {
                 case tokens.DOCUMENT:
-                    buffer.push('this.appendRaw(' + JSON.stringify(token.value) + ');\n');
+                    buffer.push('this._appendRaw(' + JSON.stringify(token.value) + ');\n');
                     break;
                 case tokens.EXPRESSION:
-                    buffer.push('this.append(' + token.value + ');\n');
+                    buffer.push('this._append(' + token.value + ');\n');
                     break;
                 case tokens.JAVASCRIPT:
                     buffer.push(token.value);
                     break;
                 case tokens.LAYOUT:
-                    buffer.push('this.layout = ' + this.nameOrExpression(token) + ';\n');
+                    buffer.push('this._layout = ' + this.nameOrExpression(token) + ';\n');
                     break;
                 case tokens.BLOCK_REFERENCE:
-                    buffer.push('this.appendRaw(this.child[' + this.nameOrExpression(token, 'content') + ']);\n');
+                    buffer.push('this._appendRaw(this.child[' + this.nameOrExpression(token, 'content') + ']);\n');
                     break;
                 case tokens.BLOCK_NAME:
-                    buffer.push('this.currentBlock = ' + this.nameOrExpression(token) + ';\n');
+                    buffer.push('this._currentBlock = ' + this.nameOrExpression(token) + ';\n');
                     break;
                 case tokens.PARTIAL:
-                    buffer.push('this.partial(' + this.nameOrExpression(token) + ');\n');
+                    buffer.push('this._partial(' + this.nameOrExpression(token) + ');\n');
                     break;
                 default:
                     throw new Error("Internal error.");
@@ -60,12 +60,12 @@ class Compiler {
 
     parseSync(text) {
         const template = new Template(this, new Function(this.compile(text)), this.data, this.child);
-        return template.executeSync();
+        return template._executeSync();
     }
 
     parse(text) {
         const template = new Template(this, new Function(this.compile(text)), this.data, this.child);
-        return template.execute();
+        return template._execute();
     }
 
     loadSync() {

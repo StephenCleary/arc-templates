@@ -6,7 +6,11 @@ All identifiers have a scope priority: built-in identifiers have the lowest prio
  
 ## Built-in identifiers
 
+### _
 
+The [lodash](https://lodash.com/docs) library is available as `_`.
+
+Canonical form: `this._`.
 
 ### Partial
 
