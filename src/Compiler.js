@@ -37,7 +37,7 @@ class Compiler {
                     buffer.push('this._append(' + token.value + ');\n');
                     break;
                 case tokens.JAVASCRIPT:
-                    buffer.push(token.value);
+                    buffer.push(token.value + ';\n');
                     break;
                 case tokens.LAYOUT:
                     buffer.push('this._layout = ' + this.nameOrExpression(token) + ';\n');
@@ -49,7 +49,7 @@ class Compiler {
                     buffer.push('this._currentBlock = ' + this.nameOrExpression(token) + ';\n');
                     break;
                 case tokens.PARTIAL:
-                    buffer.push('this._locals.partial = yield this._partial(' + this.nameOrExpression(token) + ');\n');
+                    buffer.push('this.partial = this._locals.partial = yield this._partial(' + this.nameOrExpression(token) + ');\n');
                     buffer.push('this._appendRaw(this._locals.partial.content);\n');
                     break;
                 default:

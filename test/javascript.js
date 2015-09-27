@@ -40,4 +40,13 @@ describe('javascript', () => {
             });
         });
     });
+
+    describe('for-of block', () => {
+        it('evaluates content', () => {
+            const engine = new Arc();
+            return engine.parse('<% for (var e of array) { <: <div>${e}</div> :> } %>', { array: ['a', 'b', 13]}).then(result => {
+                assert.equal(result.content, ' <div>a</div>  <div>b</div>  <div>13</div> ');
+            });
+        });
+    });
 });

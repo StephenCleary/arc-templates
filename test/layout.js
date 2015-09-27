@@ -36,6 +36,16 @@ describe('layout', () => {
                 assert.equal(result.content, ' woot container');
             });
         });
+
+        it('passes data to layout file', () => {
+            const filesystem = {
+                readFile: filename => Promise.resolve('${ test }')
+            };
+            const engine = new Arc(filesystem);
+            return engine.parse('<! mylayout.html !> <% this.data.test = "jitters"; %>').then(result => {
+                assert.equal(result.content, 'jitters');
+            });
+        });
     });
 
     describe('contents', () => {
