@@ -49,4 +49,13 @@ describe('javascript', () => {
             });
         });
     });
+
+    describe('variable declaration', () => {
+        it('is available in later expressions', () => {
+            const engine = new Arc();
+            return engine.parse('<% var x = 13; %>${x}').then(result => {
+                assert.equal(result.content, '13');
+            });
+        });
+    });
 });

@@ -60,4 +60,13 @@ describe('expression', () => {
             assert.throws(() => engine.parse('${}'), err => /^<string> \(1,3\): /.test(err.message));
         });
     });
+
+    describe('identifiers', () => {
+        it('_', () => {
+            const engine = new Arc();
+            return engine.parse('${ _.range(1)[0] }').then(result => {
+                assert.equal(result.content, '0');
+            });
+        });
+    });
 });
