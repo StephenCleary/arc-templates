@@ -18,6 +18,9 @@
   "scripts": {
     "test": "mocha --bail --compilers js:babel/register"
   },
+  "babel": {
+    "whitelist": ["es6.modules", "strict", "es6.parameters", "es6.spread"]
+  },
   "main": "./index.js",
   "keywords": [
     "template",

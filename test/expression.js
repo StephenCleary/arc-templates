@@ -50,14 +50,14 @@ describe('expression', () => {
     describe('missing end brace', () => {
         it('should throw synchronous error', () => {
             const engine = new Arc();
-            assert.throws(() => engine.parse('${value'), err => /^<string> \(1,3\): /.test(err.message));
+            assert.throws(function () { engine.parse('${value'), err => /^<string> \(1,3\): /.test(err.message) });
         });
     });
 
     describe('empty', () => {
         it('should throw synchronous error', () => {
             const engine = new Arc();
-            assert.throws(() => engine.parse('${}'), err => /^<string> \(1,3\): /.test(err.message));
+            assert.throws(function () { engine.parse('${}'), err => /^<string> \(1,3\): /.test(err.message) });
         });
     });
 
