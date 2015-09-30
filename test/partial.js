@@ -49,4 +49,19 @@ describe('partial', () => {
             });
         });
     });
+
+    describe('expression', () => {
+        it('loads partial file asynchronously', () => {
+            const filesystem = {
+                readFile: filename => Promise.resolve().then(() => {
+                    assert.equal(filename, 'myinclude.html');
+                    return 'test';
+                })
+            };
+            const engine = new Arc(filesystem);
+            return engine.parse('<( ("my" + "include" + ext) )>', { ext: '.html' }).then(result => {
+                assert.equal(result.content, 'test');
+            });
+        });
+    });
 });

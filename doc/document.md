@@ -28,7 +28,7 @@ All template files implicitly start in a special "root" document block, so plain
 
 will result in `Hi` being output.
 
-The root document block is special because it may contain "top-level" children.
+The root document block is special because it may contain "top-level" children that a nested document block may not.
 
 ## Children
 

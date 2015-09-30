@@ -61,6 +61,14 @@ describe('expression', () => {
         });
     });
 
+    describe('contains end brace', () =>
+    {
+        it('should throw synchronous error', () => {
+            const engine = new Arc();
+            assert.throws(function () { engine.parse('${ "test of }" }'), err => /^SyntaxError/.test(err.message) });
+        });
+    });
+
     describe('identifiers', () => {
         it('_', () => {
             const engine = new Arc();

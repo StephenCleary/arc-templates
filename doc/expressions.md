@@ -42,3 +42,12 @@ with a data object of `{ name: '<html>' }` will result in:
 
     Hello, <html>!
 
+## Caveats
+
+Expressions are not interpreted by ARC templates; they are only evaluated. This means that *an expression may not contain `}`*. For example, this template:
+
+    ${ 'test of }' }
+    
+will result in a syntax error when the template is compiled, because the template attempts to treat `'test of` as an expression.
+
+This means you can't use IIFEs as expressions.
