@@ -43,7 +43,7 @@ class Compiler {
                     buffer.push('this._layout = ' + this.nameOrExpression(token) + ';\n');
                     break;
                 case tokens.BLOCK_REFERENCE:
-                    buffer.push('this._appendRaw(this.child[' + this.nameOrExpression(token, 'content') + ']);\n');
+                    buffer.push('this._appendRaw(this.child[' + this.nameOrExpression(token, 'content') + '] || "");\n');
                     break;
                 case tokens.BLOCK_NAME:
                     buffer.push('this._currentBlock = ' + this.nameOrExpression(token) + ';\n');

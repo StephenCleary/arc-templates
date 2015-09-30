@@ -17,6 +17,26 @@ describe('partial', () => {
             });
         });
 
+        it('loads file relative to current file', () => {
+            const filesystem = {
+                readFile: filename => Promise.resolve().then(() => {
+                    if (filename === 'pages/mypage.html' || filename === 'pages\\mypage.html') {
+                        return '<( ../partials/header.html )>';
+                    } else if (filename === 'partials/header.html' || filename === 'partials\\header.html') {
+                        return '<( head.html )>';
+                    } else if (filename === 'partials/head.html' || filename === 'partials\\head.html') {
+                        return 'made it!';
+                    } else {
+                        throw new Error('Unknown filename ' + filename);
+                    }
+                })
+            };
+            const engine = new Arc(filesystem);
+            return engine.load('pages/mypage.html').then(result => {
+                assert.equal(result.content, 'made it!');
+            });
+        });
+
         it('has access to the same data', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('${ west }')

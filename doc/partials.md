@@ -39,7 +39,7 @@ Then the `partial.html` can read `specialValue`:
 
     ${ specialValue }
 
-### Reading multiple results from the partial template
+### Retrieving multiple results from the partial template
 
 By default, only the default "content" result is injected into the calling template. However, a partial template may define other [named blocks](layout.md) which are accessible via the [predefined `partial` identifier](identifiers.md#partial).
  

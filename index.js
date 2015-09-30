@@ -3,9 +3,9 @@ import NodeFilesystem from './src/NodeFilesystem';
 import NodePath from './src/NodePath';
 
 class Arc {
-    constructor(filesystem, path) {
+    constructor(filesystem, pathsystem) {
         this.filesystem = filesystem || new NodeFilesystem();
-        this.path = path || new NodePath();
+        this.path = pathsystem || new NodePath();
     }
 
     parse(text, data, filename) {

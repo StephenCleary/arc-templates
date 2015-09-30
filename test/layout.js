@@ -17,6 +17,26 @@ describe('layout', () => {
             });
         });
 
+        it('loads file relative to current file', () => {
+            const filesystem = {
+                readFile: filename => Promise.resolve().then(() => {
+                    if (filename === 'pages/mypage.html' || filename === 'pages\\mypage.html') {
+                        return '<! ../layouts/page.html !>';
+                    } else if (filename === 'layouts/page.html' || filename === 'layouts\\page.html') {
+                        return '<! root.html !>';
+                    } else if (filename === 'layouts/root.html' || filename === 'layouts\\root.html') {
+                        return 'made it!';
+                    } else {
+                        throw new Error('Unknown filename ' + filename);
+                    }
+                })
+            };
+            const engine = new Arc(filesystem);
+            return engine.load('pages/mypage.html').then(result => {
+                assert.equal(result.content, 'made it!');
+            });
+        });
+
         it('has access to the same data', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('${ west }')
@@ -76,6 +96,31 @@ describe('layout', () => {
             const engine = new Arc(filesystem);
             return engine.parse('<! mylayout.html !> woot <[ bob <: data :> ]>').then(result => {
                 assert.equal(result.content, ' data ');
+            });
+        });
+
+        it('substitutes empty string for missing content blocks', () => {
+            const filesystem = {
+                readFile: filename => Promise.resolve('<* bob *><**>')
+            };
+            const engine = new Arc(filesystem);
+            return engine.parse('<! mylayout.html !> woot').then(result => {
+                assert.equal(result.content, ' woot');
+            });
+        });
+
+        describe('expression', () => {
+            it('loads partial file asynchronously', () => {
+                const filesystem = {
+                    readFile: filename => Promise.resolve().then(() => {
+                        assert.equal(filename, 'mytemplate.html');
+                        return 'test';
+                    })
+                };
+                const engine = new Arc(filesystem);
+                return engine.parse('<! ("my" + "template" + ext) !>', { ext: '.html' }).then(result => {
+                    assert.equal(result.content, 'test');
+                });
             });
         });
     });
