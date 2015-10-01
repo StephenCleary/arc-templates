@@ -14,7 +14,7 @@ Canonical form: `this._`.
 
 ### Partial
 
-The `partial` object contains the results of the last [partial template call](partial.md). This is generally used to retrieve named blocks from the partial template.
+The `partial` object contains the results of the last [partial template call](partials.md). This is generally used to retrieve named blocks from the partial template.
 
 Canonical form: `this.partial`.
 
