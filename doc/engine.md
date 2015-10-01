@@ -15,7 +15,7 @@ The initial entry point for the ARC template library is the engine class:
 
 ## Constructor
 
-The `Arc` constructor can take two parameters: [a filesystem and a pathsystem](filesystem.md). The default values for these parameters are sufficient for Node environments.
+The `Arc` constructor can take up to three parameters: [a filesystem, a pathsystem](filesystem.md), and an [escape function](expressions.md#escaping). The default values for these parameters are sufficient for Node environments generating HTML documents.
 
 ## load
 

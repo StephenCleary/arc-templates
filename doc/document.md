@@ -2,6 +2,8 @@
 
 Document blocks are interpreted as regular document content. Their content is copied directly to the output, including whitespace, with no escaping or modification of any kind.
 
+ARC Templates are commonly used as HTML templates, but they can also be used to produce any other kind of document as well. For other document types, you may want to change the [default expression escaping](expressions.md#escaping) by passing a custom function to the [ARC engine constructor](engine.md).
+
 ## Basic syntax
 
 Document blocks start with `<:` and end with `:>`. They are used within [JavaScript blocks](language.md) and [named blocks](layout.md).

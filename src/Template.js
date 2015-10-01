@@ -16,7 +16,7 @@ class RawString {
  * A compiled template.
  */
 class Template {
-    constructor(compiler, evaluate, data, child) {
+    constructor(compiler, evaluate, data, child, escape) {
         this._ = _;
         this._compiler = compiler;
         this._evaluate = Promise.coroutine(evaluate);
@@ -53,7 +53,7 @@ class Template {
         if (str instanceof RawString) {
             this._appendRaw(str);
         } else {
-            this._appendRaw(_.escape(str));
+            this._appendRaw(this._compiler.arc.escape(str));
         }
     }
 
