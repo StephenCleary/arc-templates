@@ -6,9 +6,8 @@ const MISSING_FILENAME = '<string>';
 const globalEval = eval;
 
 class Compiler {
-    constructor(arc, filename) {
+    constructor(arc) {
         this.arc = arc;
-        this.filename = filename || MISSING_FILENAME;
     }
 
     _nameOrExpression(token, defaultIfEmpty) {
@@ -23,8 +22,8 @@ class Compiler {
         return value.startsWith('(') ? value : JSON.stringify(value);
     }
 
-    _compile(text) {
-        const lexer = new Lexer(text, this.filename);
+    _compile(text, filename) {
+        const lexer = new Lexer(text, filename);
         const buffer = ['with (this._locals) with (this.data) {\n'];
         for (let token of lexer.lex()) {
             switch (token.token) {
@@ -58,22 +57,27 @@ class Compiler {
         return buffer.join('');
     }
 
-    evaluateString(text, data, child) {
+    compileString(text, filename) {
+        filename = filename || MISSING_FILENAME;
         // As much as I dislike eval, GeneratorFunction doesn't seem to be working yet.
-        const func = globalEval('(function *() { ' + this._compile(text) + ' })');
-        const template = new Template(this, func);
-        return template._execute(data, child);
+        const func = globalEval('(function *() { ' + this._compile(text, filename) + ' })');
+        const template = new Template(this, func, filename);
+        return template._execute.bind(template);
     }
 
-    evaluateFile(data, child) {
-        return this.arc.filesystem.readFile(this.filename).then(text => this.evaluateString(text, data, child));
+    evaluateString(text, filename, data, child) {
+        return this.compileString(text, filename)(data, child);
     }
 
-    joinedPath(path) {
-        if (this.filename === MISSING_FILENAME) {
+    evaluateFile(filename, data, child) {
+        return this.arc.filesystem.readFile(filename).then(text => this.evaluateString(text, filename, data, child));
+    }
+
+    joinedPath(filename, path) {
+        if (filename === MISSING_FILENAME) {
             return path;
         }
-        return this.arc.path.join(this.arc.path.dirname(this.filename), path);
+        return this.arc.path.join(this.arc.path.dirname(filename), path);
     }
 }
 

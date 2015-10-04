@@ -16,10 +16,11 @@ class RawString {
  * A compiled template.
  */
 class Template {
-    constructor(compiler, evaluate) {
+    constructor(compiler, evaluate, filename) {
         this._ = _;
         this._compiler = compiler;
         this._evaluate = Promise.coroutine(evaluate);
+        this._filename = filename;
         this._result = {
             content: ''
         };
@@ -37,7 +38,7 @@ class Template {
             if (this._layout === undefined) {
                 return this._result;
             }
-            return new Compiler(this._compiler.arc, this._compiler.joinedPath(this._layout)).evaluateFile(this.data, this._result);
+            return new Compiler(this._compiler.arc).evaluateFile(this._compiler.joinedPath(this._filename, this._layout), this.data, this._result);
         });
     }
 
@@ -62,7 +63,7 @@ class Template {
     }
 
     _partial(path) {
-        return new Compiler(this._compiler.arc, this._compiler.joinedPath(path)).evaluateFile(this.data);
+        return new Compiler(this._compiler.arc).evaluateFile(this._compiler.joinedPath(this._filename, path), this.data);
     }
 }
 
