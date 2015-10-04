@@ -2,7 +2,6 @@ var gulp = require('gulp');
 var eslint = require('gulp-eslint');
 var mocha = require('gulp-mocha');
 var sourcemaps = require('gulp-sourcemaps');
-var concat = require('gulp-concat');
 var babel = require('gulp-babel');
 require('babel/register');
 
@@ -18,14 +17,22 @@ gulp.task('test', function () {
         .pipe(mocha({ bail: true }));
 });
 
-gulp.task('compile', function () {
+gulp.task('compile-src', function () {
     return gulp.src(['src/**/*.js'])
         .pipe(sourcemaps.init())
         .pipe(babel({ optional: ['runtime'] }))
-        .pipe(concat('index.js'))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('dist/src'));
+});
+
+gulp.task('compile-index', function () {
+    return gulp.src(['index.js'])
+        .pipe(sourcemaps.init())
+        .pipe(babel({ optional: ['runtime'] }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('default', ['lint', 'test', 'compile'], function () {
-});
+gulp.task('compile', ['compile-index', 'compile-src'], function () { });
+
+gulp.task('default', ['lint', 'test', 'compile'], function () { });
