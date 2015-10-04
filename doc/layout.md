@@ -64,6 +64,8 @@ will result in:
 
     body text</body>
 
+The default block has the name `content`, so the named block reference `<* content *>` is the same as `<**>`.
+
 If a named block references a block that doesn't exist, then an empty string is used. E.g., using the same `mylayout.html`, the following page:
 
     <! mylayout.html !>
@@ -88,7 +90,7 @@ Then `mylayout.html` can read `specialValue`:
 
     Child content: <**>, and special value ${ specialValue }.
 
-### Dynamic layouts, named blocks, and block references
+### Dynamic layouts
 
 Normally, the filename of the layout template is well-known and just included in the calling template as a constant. However, if you need to dynamically determine the layout template filename, you can start the name with `(`, which will cause it to be evaluated as an expression:
 

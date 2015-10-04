@@ -12,6 +12,12 @@ The [lodash](https://lodash.com/docs) library is available as `_`.
 
 Canonical form: `this._`.
 
+### Child
+
+The `child` object contains the results of the [child template of which this template is the layout](layout.md). This provides a way of accessing named blocks [from code](language.md) or [expressions](expressions.md).
+
+Canonical form: `this.child`.
+
 ### Partial
 
 The `partial` object contains the results of the last [partial template call](partials.md). This is generally used to retrieve named blocks from the partial template.

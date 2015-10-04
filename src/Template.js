@@ -28,6 +28,7 @@ class Template {
         this._currentBlock = 'content';
         this._locals = {
             _: this._,
+            child: this.child,
             raw: this.raw
         };
     }
