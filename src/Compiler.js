@@ -13,7 +13,7 @@ class Compiler {
         this.child = child;
     }
 
-    nameOrExpression(token, defaultIfEmpty) {
+    _nameOrExpression(token, defaultIfEmpty) {
         let value = token.value.trim();
         if (value === '') {
             if (defaultIfEmpty !== undefined) {
@@ -25,7 +25,7 @@ class Compiler {
         return value.startsWith('(') ? value : JSON.stringify(value);
     }
 
-    compile(text) {
+    _compile(text) {
         const lexer = new Lexer(text, this.filename);
         const buffer = ['with (this._locals) with (this.data) {\n'];
         for (let token of lexer.lex()) {
@@ -40,16 +40,16 @@ class Compiler {
                     buffer.push(token.value + ';\n');
                     break;
                 case tokens.LAYOUT:
-                    buffer.push('this._layout = ' + this.nameOrExpression(token) + ';\n');
+                    buffer.push('this._layout = ' + this._nameOrExpression(token) + ';\n');
                     break;
                 case tokens.BLOCK_REFERENCE:
-                    buffer.push('this._appendRaw(this.child[' + this.nameOrExpression(token, 'content') + '] || "");\n');
+                    buffer.push('this._appendRaw(this.child[' + this._nameOrExpression(token, 'content') + '] || "");\n');
                     break;
                 case tokens.BLOCK_NAME:
-                    buffer.push('this._currentBlock = ' + this.nameOrExpression(token) + ';\n');
+                    buffer.push('this._currentBlock = ' + this._nameOrExpression(token) + ';\n');
                     break;
                 case tokens.PARTIAL:
-                    buffer.push('this.partial = this._locals.partial = yield this._partial(' + this.nameOrExpression(token) + ');\n');
+                    buffer.push('this.partial = this._locals.partial = yield this._partial(' + this._nameOrExpression(token) + ');\n');
                     buffer.push('this._appendRaw(this._locals.partial.content);\n');
                     break;
                 default:
@@ -60,15 +60,15 @@ class Compiler {
         return buffer.join('');
     }
 
-    parse(text) {
+    evaluateString(text) {
         // As much as I dislike eval, GeneratorFunction doesn't seem to be working yet.
-        const func = globalEval('(function *() { ' + this.compile(text) + ' })');
+        const func = globalEval('(function *() { ' + this._compile(text) + ' })');
         const template = new Template(this, func, this.data, this.child);
         return template._execute();
     }
 
-    load() {
-        return this.arc.filesystem.readFile(this.filename).then(text => this.parse(text));
+    evaluateFile() {
+        return this.arc.filesystem.readFile(this.filename).then(text => this.evaluateString(text));
     }
 
     joinedPath(path) {

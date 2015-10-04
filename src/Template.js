@@ -37,7 +37,7 @@ class Template {
             if (this._layout === undefined) {
                 return this._result;
             }
-            return new Compiler(this._compiler.arc, this._compiler.joinedPath(this._layout), this.data, this._result).load();
+            return new Compiler(this._compiler.arc, this._compiler.joinedPath(this._layout), this.data, this._result).evaluateFile();
         });
     }
 
@@ -62,7 +62,7 @@ class Template {
     }
 
     _partial(path) {
-        return new Compiler(this._compiler.arc, this._compiler.joinedPath(path), this.data).load();
+        return new Compiler(this._compiler.arc, this._compiler.joinedPath(path), this.data).evaluateFile();
     }
 }
 
