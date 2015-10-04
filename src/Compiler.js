@@ -5,62 +5,61 @@ import tokens from './tokens';
 const MISSING_FILENAME = '<string>';
 const globalEval = eval;
 
+function nameOrExpression(token, defaultIfEmpty) {
+    let value = token.value.trim();
+    if (value === '') {
+        if (defaultIfEmpty !== undefined) {
+            value = defaultIfEmpty;
+        } else {
+            throw new Error(token.begin + ': ' + token.token + ' tag must contain a name or expression.');
+        }
+    }
+    return value.startsWith('(') ? value : JSON.stringify(value);
+}
+
+function compile(text, filename) {
+    const lexer = new Lexer(text, filename);
+    const buffer = ['with (this._locals) with (this.data) {\n'];
+    for (let token of lexer.lex()) {
+        switch (token.token) {
+            case tokens.DOCUMENT:
+                buffer.push('this._appendRaw(' + JSON.stringify(token.value) + ');\n');
+                break;
+            case tokens.EXPRESSION:
+                buffer.push('this._append(' + token.value + ');\n');
+                break;
+            case tokens.JAVASCRIPT:
+                buffer.push(token.value + ';\n');
+                break;
+            case tokens.LAYOUT:
+                buffer.push('this._layout = ' + nameOrExpression(token) + ';\n');
+                break;
+            case tokens.BLOCK_REFERENCE:
+                buffer.push('this._appendRaw(this.child[' + nameOrExpression(token, 'content') + '] || "");\n');
+                break;
+            case tokens.BLOCK_NAME:
+                buffer.push('this._currentBlock = ' + nameOrExpression(token) + ';\n');
+                break;
+            case tokens.PARTIAL:
+                buffer.push('this.partial = this._locals.partial = yield this._partial(' + nameOrExpression(token) + ');\n');
+                buffer.push('this._appendRaw(this._locals.partial.content);\n');
+                break;
+            default:
+                throw new Error("Internal error.");
+        }
+    }
+    buffer.push('}');
+    return buffer.join('');
+}
+
 class Compiler {
     constructor(arc) {
         this.arc = arc;
     }
 
-    _nameOrExpression(token, defaultIfEmpty) {
-        let value = token.value.trim();
-        if (value === '') {
-            if (defaultIfEmpty !== undefined) {
-                value = defaultIfEmpty;
-            } else {
-                throw new Error(token.begin + ': ' + token.token + ' tag must contain a name or expression.');
-            }
-        }
-        return value.startsWith('(') ? value : JSON.stringify(value);
-    }
-
-    _compile(text, filename) {
-        const lexer = new Lexer(text, filename);
-        const buffer = ['with (this._locals) with (this.data) {\n'];
-        for (let token of lexer.lex()) {
-            switch (token.token) {
-                case tokens.DOCUMENT:
-                    buffer.push('this._appendRaw(' + JSON.stringify(token.value) + ');\n');
-                    break;
-                case tokens.EXPRESSION:
-                    buffer.push('this._append(' + token.value + ');\n');
-                    break;
-                case tokens.JAVASCRIPT:
-                    buffer.push(token.value + ';\n');
-                    break;
-                case tokens.LAYOUT:
-                    buffer.push('this._layout = ' + this._nameOrExpression(token) + ';\n');
-                    break;
-                case tokens.BLOCK_REFERENCE:
-                    buffer.push('this._appendRaw(this.child[' + this._nameOrExpression(token, 'content') + '] || "");\n');
-                    break;
-                case tokens.BLOCK_NAME:
-                    buffer.push('this._currentBlock = ' + this._nameOrExpression(token) + ';\n');
-                    break;
-                case tokens.PARTIAL:
-                    buffer.push('this.partial = this._locals.partial = yield this._partial(' + this._nameOrExpression(token) + ');\n');
-                    buffer.push('this._appendRaw(this._locals.partial.content);\n');
-                    break;
-                default:
-                    throw new Error("Internal error.");
-            }
-        }
-        buffer.push('}');
-        return buffer.join('');
-    }
-
     compileString(text, filename) {
-        filename = filename || MISSING_FILENAME;
         // As much as I dislike eval, GeneratorFunction doesn't seem to be working yet.
-        const func = globalEval('(function *() { ' + this._compile(text, filename) + ' })');
+        const func = globalEval('(function *() { ' + compile(text, filename) + ' })');
         const template = new Template(this, func, filename);
         return template._execute.bind(template);
     }
