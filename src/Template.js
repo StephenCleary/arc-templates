@@ -16,29 +16,28 @@ class RawString {
  * A compiled template.
  */
 class Template {
-    constructor(compiler, evaluate, data, child) {
+    constructor(compiler, evaluate) {
         this._ = _;
         this._compiler = compiler;
         this._evaluate = Promise.coroutine(evaluate);
-        this.data = data || {};
-        this.child = child;
         this._result = {
             content: ''
         };
         this._currentBlock = 'content';
         this._locals = {
             _: this._,
-            child: this.child,
             raw: this.raw
         };
     }
 
-    _execute() {
+    _execute(data, child) {
+        this.data = data || {};
+        this.child = this._locals.child =  child;
         return this._evaluate().then(() => {
             if (this._layout === undefined) {
                 return this._result;
             }
-            return new Compiler(this._compiler.arc, this._compiler.joinedPath(this._layout), this.data, this._result).evaluateFile();
+            return new Compiler(this._compiler.arc, this._compiler.joinedPath(this._layout)).evaluateFile(this.data, this._result);
         });
     }
 
@@ -63,7 +62,7 @@ class Template {
     }
 
     _partial(path) {
-        return new Compiler(this._compiler.arc, this._compiler.joinedPath(path), this.data).evaluateFile();
+        return new Compiler(this._compiler.arc, this._compiler.joinedPath(path)).evaluateFile(this.data);
     }
 }
 

@@ -11,11 +11,11 @@ class Arc {
     }
 
     parse(text, data, filename) {
-        return new Compiler(this, filename, data).evaluateString(text);
+        return new Compiler(this, filename).evaluateString(text, data);
     }
 
     load(filename, data) {
-        return new Compiler(this, filename, data).evaluateFile();
+        return new Compiler(this, filename).evaluateFile(data);
     }
 }
 

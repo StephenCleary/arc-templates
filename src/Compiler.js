@@ -6,11 +6,9 @@ const MISSING_FILENAME = '<string>';
 const globalEval = eval;
 
 class Compiler {
-    constructor(arc, filename, data, child) {
+    constructor(arc, filename) {
         this.arc = arc;
         this.filename = filename || MISSING_FILENAME;
-        this.data = data;
-        this.child = child;
     }
 
     _nameOrExpression(token, defaultIfEmpty) {
@@ -60,15 +58,15 @@ class Compiler {
         return buffer.join('');
     }
 
-    evaluateString(text) {
+    evaluateString(text, data, child) {
         // As much as I dislike eval, GeneratorFunction doesn't seem to be working yet.
         const func = globalEval('(function *() { ' + this._compile(text) + ' })');
-        const template = new Template(this, func, this.data, this.child);
-        return template._execute();
+        const template = new Template(this, func);
+        return template._execute(data, child);
     }
 
-    evaluateFile() {
-        return this.arc.filesystem.readFile(this.filename).then(text => this.evaluateString(text));
+    evaluateFile(data, child) {
+        return this.arc.filesystem.readFile(this.filename).then(text => this.evaluateString(text, data, child));
     }
 
     joinedPath(path) {
