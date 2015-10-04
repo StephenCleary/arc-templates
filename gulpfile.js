@@ -3,7 +3,7 @@ var eslint = require('gulp-eslint');
 var mocha = require('gulp-mocha');
 var sourcemaps = require('gulp-sourcemaps');
 var babel = require('gulp-babel');
-require('babel/register');
+require('babel-core/register');
 
 gulp.task('lint', function () {
     return gulp.src(['src/**/*.js'])
