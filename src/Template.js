@@ -16,7 +16,7 @@ class RawString {
  * A compiled template.
  */
 class Template {
-    constructor(compiler, evaluate, data, child, escape) {
+    constructor(compiler, evaluate, data, child) {
         this._ = _;
         this._compiler = compiler;
         this._evaluate = Promise.coroutine(evaluate);

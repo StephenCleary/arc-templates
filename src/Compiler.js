@@ -68,7 +68,7 @@ class Compiler {
     }
 
     load() {
-        return this.arc.filesystem.readFile(this.filename).then(text => this.parse(text, this.data, this.child));
+        return this.arc.filesystem.readFile(this.filename).then(text => this.parse(text));
     }
 
     joinedPath(path) {
