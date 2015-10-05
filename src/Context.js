@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Compiler from './Compiler';
+import Template from './Template';
 import Promise from 'bluebird';
 
 class RawString {
@@ -16,9 +16,9 @@ class RawString {
  * The context in which a template executes.
  */
 class Context {
-    constructor(compiler, evaluate, filename) {
+    constructor(template, evaluate, filename) {
         this._ = _;
-        this._compiler = compiler;
+        this._template = template;
         this._evaluate = Promise.coroutine(evaluate);
         this._filename = filename;
         this._result = {
@@ -38,7 +38,7 @@ class Context {
             if (this._layout === undefined) {
                 return this._result;
             }
-            return new Compiler(this._compiler.arc).evaluateFile(this._compiler.joinedPath(this._filename, this._layout), this.data, this._result);
+            return new Template(this._template.arc).evaluateFile(this._template.joinedPath(this._filename, this._layout), this.data, this._result);
         });
     }
 
@@ -54,7 +54,7 @@ class Context {
         if (str instanceof RawString) {
             this._appendRaw(str);
         } else {
-            this._appendRaw(this._compiler.arc.escape(str));
+            this._appendRaw(this._template.arc.escape(str));
         }
     }
 
@@ -63,7 +63,7 @@ class Context {
     }
 
     _partial(path) {
-        return new Compiler(this._compiler.arc).evaluateFile(this._compiler.joinedPath(this._filename, path), this.data);
+        return new Template(this._template.arc).evaluateFile(this._template.joinedPath(this._filename, path), this.data);
     }
 }
 

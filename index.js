@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Compiler from './src/Compiler';
+import Template from './src/Template';
 import NodeFilesystem from './src/NodeFilesystem';
 import NodePath from './src/NodePath';
 
@@ -11,11 +11,11 @@ class Arc {
     }
 
     parse(text, data, filename) {
-        return new Compiler(this).evaluateString(text, filename, data);
+        return new Template(this).evaluateString(text, filename, data);
     }
 
     load(filename, data) {
-        return new Compiler(this).evaluateFile(filename, data);
+        return new Template(this).evaluateFile(filename, data);
     }
 }
 

@@ -52,7 +52,7 @@ function compile(text, filename) {
     return buffer.join('');
 }
 
-class Compiler {
+class Template {
     constructor(arc) {
         this.arc = arc;
     }
@@ -80,4 +80,4 @@ class Compiler {
     }
 }
 
-export default Compiler;
+export default Template;
