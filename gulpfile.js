@@ -17,22 +17,38 @@ gulp.task('test', function () {
         .pipe(mocha({ bail: true }));
 });
 
-gulp.task('compile-src', function () {
-    return gulp.src(['src/**/*.js'])
-        .pipe(sourcemaps.init())
-        .pipe(babel({ optional: ['runtime'] }))
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('dist/src'));
-});
-
-gulp.task('compile-index', function () {
+gulp.task('compile-es5-index', function () {
     return gulp.src(['index.js'])
         .pipe(sourcemaps.init())
         .pipe(babel({ optional: ['runtime'] }))
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('dist'));
+        .pipe(gulp.dest('dist/es5'));
 });
 
-gulp.task('compile', ['compile-index', 'compile-src'], function () { });
+gulp.task('compile-es5-src', function () {
+    return gulp.src(['src/**/*.js'])
+        .pipe(sourcemaps.init())
+        .pipe(babel({ optional: ['runtime'] }))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('dist/es5/src'));
+});
+
+gulp.task('compile-node4-index', function () {
+    return gulp.src(['index.js'])
+        .pipe(sourcemaps.init())
+        .pipe(babel({ optional: ['runtime'] }))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('dist/node4'));
+});
+
+gulp.task('compile-node4-src', function () {
+    return gulp.src(['src/**/*.js'])
+        .pipe(sourcemaps.init())
+        .pipe(babel({ optional: ['runtime'] }))
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('dist/node4/src'));
+});
+
+gulp.task('compile', ['compile-es5-index', 'compile-es5-src', 'compile-node4-index', 'compile-node4-src'], function () { });
 
 gulp.task('default', ['lint', 'test', 'compile'], function () { });

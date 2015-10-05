@@ -5,6 +5,8 @@ Fully powered ES6 JavaScript template engine with halfway-decent syntax.
 
 [![Dependency Status](https://david-dm.org/StephenCleary/arc-templates.svg)](https://david-dm.org/StephenCleary/arc-templates) [![devDependency Status](https://david-dm.org/StephenCleary/arc-templates/dev-status.svg)](https://david-dm.org/StephenCleary/arc-templates#info=devDependencies)
 
+There are two "builds" available: a Node.js 4+ version with minimal Babel transpiling, and an ES5 version with full Babel transpiling. The unit tests are run on the latest Node.js version, using minimal transpiling.
+
 # Simple example
 
 Templates can use [expressions](doc/expressions.md):
