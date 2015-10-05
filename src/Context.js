@@ -13,9 +13,9 @@ class RawString {
 }
 
 /**
- * A compiled template.
+ * The context in which a template executes.
  */
-class Template {
+class Context {
     constructor(compiler, evaluate, filename) {
         this._ = _;
         this._compiler = compiler;
@@ -67,4 +67,4 @@ class Template {
     }
 }
 
-export default Template;
+export default Context;

@@ -1,5 +1,5 @@
 import Lexer from './Lexer';
-import Template from './Template';
+import Context from './Context';
 import tokens from './tokens';
 
 const MISSING_FILENAME = '<string>';
@@ -60,8 +60,8 @@ class Compiler {
     compileString(text, filename) {
         // As much as I dislike eval, GeneratorFunction doesn't seem to be working yet.
         const func = globalEval('(function *() { ' + compile(text, filename) + ' })');
-        const template = new Template(this, func, filename);
-        return template._execute.bind(template);
+        const context = new Context(this, func, filename);
+        return context._execute.bind(context);
     }
 
     evaluateString(text, filename, data, child) {
