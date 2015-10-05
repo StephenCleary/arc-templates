@@ -1,6 +1,7 @@
 import Lexer from './Lexer';
 import Context from './Context';
 import tokens from './tokens';
+import Promise from 'bluebird';
 
 const MISSING_FILENAME = '<string>';
 const globalEval = eval;
