@@ -11,11 +11,11 @@ class Arc {
     }
 
     parse(text, data, filename) {
-        return new Template(this).evaluateString(text, filename, data);
+        return Template.fromString(this, text, filename).evaluate(data);
     }
 
     load(filename, data) {
-        return new Template(this).evaluateFile(filename, data);
+        return Template.fromFile(this, filename).evaluate(data);
     }
 }
 

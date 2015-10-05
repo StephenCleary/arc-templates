@@ -57,26 +57,52 @@ class Template {
         this.arc = arc;
     }
 
-    compileString(text, filename) {
-        // As much as I dislike eval, GeneratorFunction doesn't seem to be working yet.
-        const func = globalEval('(function *() { ' + compile(text, filename) + ' })');
-        const context = new Context(this, func, filename);
-        return context._execute.bind(context);
+    get filename() {
+        return this._filename || MISSING_FILENAME;
+    }
+    set filename(value) {
+        this._filename = value;
     }
 
-    evaluateString(text, filename, data, child) {
-        return this.compileString(text, filename)(data, child);
+    load() {
+        if (this.text !== undefined) {
+            return Promise.resolve(this.text);
+        } else {
+            return this.arc.filesystem.readFile(this.filename).then(text => this.text = text);
+        }
     }
 
-    evaluateFile(filename, data, child) {
-        return this.arc.filesystem.readFile(filename).then(text => this.evaluateString(text, filename, data, child));
+    compile() {
+        return this.load().then(text => {
+            // As much as I dislike eval, GeneratorFunction doesn't seem to be working yet.
+            const func = globalEval('(function *() { ' + compile(text, this.filename) + ' })');
+            const context = new Context(this, func, this.filename);
+            return context._execute.bind(context);
+        });
     }
 
-    joinedPath(filename, path) {
-        if (filename === MISSING_FILENAME) {
+    evaluate(data, child) {
+        return this.compile().then(execute => execute(data, child));
+    }
+
+    joinedPath(path) {
+        if (this.filename === MISSING_FILENAME) {
             return path;
         }
-        return this.arc.path.join(this.arc.path.dirname(filename), path);
+        return this.arc.path.join(this.arc.path.dirname(this.filename), path);
+    }
+
+    static fromFile(arc, filename) {
+        const result = new Template(arc);
+        result.filename = filename;
+        return result;
+    }
+
+    static fromString(arc, text, filename) {
+        const result = new Template(arc);
+        result.text = text;
+        result.filename = filename;
+        return result;
     }
 }
 

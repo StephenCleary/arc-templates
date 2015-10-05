@@ -38,7 +38,7 @@ class Context {
             if (this._layout === undefined) {
                 return this._result;
             }
-            return new Template(this._template.arc).evaluateFile(this._template.joinedPath(this._filename, this._layout), this.data, this._result);
+            return Template.fromFile(this._template.arc, this._template.joinedPath(this._layout)).evaluate(this.data, this._result);
         });
     }
 
@@ -63,7 +63,7 @@ class Context {
     }
 
     _partial(path) {
-        return new Template(this._template.arc).evaluateFile(this._template.joinedPath(this._filename, path), this.data);
+        return Template.fromFile(this._template.arc, this._template.joinedPath(path)).evaluate(this.data);
     }
 }
 

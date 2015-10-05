@@ -48,24 +48,26 @@ describe('expression', () => {
     });
 
     describe('missing end brace', () => {
-        it('should throw synchronous error', () => {
+        it('should throw error', () => {
             const engine = new Arc();
-            assert.throws(function () { engine.parse('${value'), err => /^<string> \(1,3\): /.test(err.message) });
+            return Promise.resolve().then(() => engine.parse('${value')).then(assert.fail,
+                    err => assert(/^<string> \(1,3\): /.test(err.message), err.message));
         });
     });
 
     describe('empty', () => {
-        it('should throw synchronous error', () => {
+        it('should throw error', () => {
             const engine = new Arc();
-            assert.throws(function () { engine.parse('${}'), err => /^<string> \(1,3\): /.test(err.message) });
+            return Promise.resolve().then(() => engine.parse('${}')).then(assert.fail,
+                    err => assert(/^<string> \(1,3\): /.test(err.message), err.message));
         });
     });
 
-    describe('contains end brace', () =>
-    {
-        it('should throw synchronous error', () => {
+    describe('contains end brace', () => {
+        it('should throw error', () => {
             const engine = new Arc();
-            assert.throws(function () { engine.parse('${ "test of }" }'), err => /^SyntaxError/.test(err.message) });
+            return Promise.resolve().then(() => engine.parse('${ "test of }" }')).then(assert.fail,
+                    err => assert(err instanceof SyntaxError, err.message));
         });
     });
 
