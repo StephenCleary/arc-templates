@@ -21,10 +21,6 @@ class Context {
         this._template = template;
         this._evaluate = Promise.coroutine(evaluate);
         this._filename = filename;
-        this._result = {
-            content: ''
-        };
-        this._currentBlock = 'content';
         this._locals = {
             _: this._,
             raw: this.raw
@@ -32,6 +28,10 @@ class Context {
     }
 
     _execute(data, child) {
+        this._result = {
+            content: ''
+        };
+        this._currentBlock = 'content';
         this.data = data || {};
         this.child = this._locals.child =  child;
         return this._evaluate().then(() => {
