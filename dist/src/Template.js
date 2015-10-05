@@ -6,79 +6,119 @@ Object.defineProperty(exports, '__esModule', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _lodash = require('lodash');
+var _Lexer = require('./Lexer');
 
-var _lodash2 = _interopRequireDefault(_lodash);
+var _Lexer2 = _interopRequireDefault(_Lexer);
 
-var _Compiler = require('./Compiler');
+var _Context = require('./Context');
 
-var _Compiler2 = _interopRequireDefault(_Compiler);
+var _Context2 = _interopRequireDefault(_Context);
 
-var _bluebird = require('bluebird');
+var _tokens = require('./tokens');
 
-var _bluebird2 = _interopRequireDefault(_bluebird);
+var _tokens2 = _interopRequireDefault(_tokens);
 
-class RawString {
-    constructor(value) {
-        this.value = value;
+const MISSING_FILENAME = '<string>';
+const globalEval = eval;
+
+function nameOrExpression(token, defaultIfEmpty) {
+    let value = token.value.trim();
+    if (value === '') {
+        if (defaultIfEmpty !== undefined) {
+            value = defaultIfEmpty;
+        } else {
+            throw new Error(token.begin + ': ' + token.token + ' tag must contain a name or expression.');
+        }
     }
-
-    toString() {
-        return this.value;
-    }
+    return value.startsWith('(') ? value : JSON.stringify(value);
 }
 
-/**
- * A compiled template.
- */
+function compile(text, filename) {
+    const lexer = new _Lexer2.default(text, filename);
+    const buffer = ['with (this._locals) with (this.data) {\n'];
+    for (let token of lexer.lex()) {
+        switch (token.token) {
+            case _tokens2.default.DOCUMENT:
+                buffer.push('this._appendRaw(' + JSON.stringify(token.value) + ');\n');
+                break;
+            case _tokens2.default.EXPRESSION:
+                buffer.push('this._append(' + token.value + ');\n');
+                break;
+            case _tokens2.default.JAVASCRIPT:
+                buffer.push(token.value + ';\n');
+                break;
+            case _tokens2.default.LAYOUT:
+                buffer.push('this._layout = ' + nameOrExpression(token) + ';\n');
+                break;
+            case _tokens2.default.BLOCK_REFERENCE:
+                buffer.push('this._appendRaw(this.child[' + nameOrExpression(token, 'content') + '] || "");\n');
+                break;
+            case _tokens2.default.BLOCK_NAME:
+                buffer.push('this._currentBlock = ' + nameOrExpression(token) + ';\n');
+                break;
+            case _tokens2.default.PARTIAL:
+                buffer.push('this.partial = this._locals.partial = yield this._partial(' + nameOrExpression(token) + ');\n');
+                buffer.push('this._appendRaw(this._locals.partial.content);\n');
+                break;
+            default:
+                throw new Error("Internal error.");
+        }
+    }
+    buffer.push('}');
+    return buffer.join('');
+}
+
 class Template {
-    constructor(compiler, evaluate, data, child, escape) {
-        this._ = _lodash2.default;
-        this._compiler = compiler;
-        this._evaluate = _bluebird2.default.coroutine(evaluate);
-        this.data = data || {};
-        this.child = child;
-        this._result = {
-            content: ''
-        };
-        this._currentBlock = 'content';
-        this._locals = {
-            _: this._,
-            raw: this.raw
-        };
+    constructor(arc) {
+        this.arc = arc;
     }
 
-    _execute() {
-        return this._evaluate().then(() => {
-            if (this._layout === undefined) {
-                return this._result;
-            }
-            return new _Compiler2.default(this._compiler.arc, this._compiler.joinedPath(this._layout), this.data, this._result).load();
+    get filename() {
+        return this._filename || MISSING_FILENAME;
+    }
+    set filename(value) {
+        this._filename = value;
+    }
+
+    load() {
+        if (this.text !== undefined) {
+            return Promise.resolve(this.text);
+        } else {
+            return this.arc.filesystem.readFile(this.filename).then(text => this.text = text);
+        }
+    }
+
+    compile() {
+        return this.load().then(text => {
+            // As much as I dislike eval, GeneratorFunction doesn't seem to be working yet.
+            const func = globalEval('(function *() { ' + compile(text, this.filename) + ' })');
+            const context = new _Context2.default(this, func, this.filename);
+            return context._execute.bind(context);
         });
     }
 
-    _appendRaw(str) {
-        if (this._result[this._currentBlock] === undefined) {
-            this._result[this._currentBlock] = str;
-        } else {
-            this._result[this._currentBlock] += str;
+    evaluate(data, child) {
+        return this.compile().then(execute => execute(data, child));
+    }
+
+    joinedPath(path) {
+        if (this.filename === MISSING_FILENAME) {
+            return path;
         }
+        return this.arc.path.join(this.arc.path.dirname(this.filename), path);
     }
 
-    _append(str) {
-        if (str instanceof RawString) {
-            this._appendRaw(str);
-        } else {
-            this._appendRaw(this._compiler.arc.escape(str));
-        }
+    static fromFile(arc, filename) {
+        const result = new Template(arc);
+        result.filename = filename;
+        return result;
     }
 
-    raw(str) {
-        return new RawString(str);
-    }
-
-    _partial(path) {
-        return new _Compiler2.default(this._compiler.arc, this._compiler.joinedPath(path), this.data).load();
+    static fromString(arc, text, filename) {
+        const result = new Template(arc);
+        result.text = text;
+        result.filename = filename;
+        return result;
     }
 }
 

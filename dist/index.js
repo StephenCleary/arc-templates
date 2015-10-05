@@ -10,9 +10,9 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _srcCompiler = require('./src/Compiler');
+var _srcTemplate = require('./src/Template');
 
-var _srcCompiler2 = _interopRequireDefault(_srcCompiler);
+var _srcTemplate2 = _interopRequireDefault(_srcTemplate);
 
 var _srcNodeFilesystem = require('./src/NodeFilesystem');
 
@@ -29,12 +29,20 @@ class Arc {
         this.escape = escape || _lodash2.default.escape;
     }
 
-    parse(text, data, filename) {
-        return new _srcCompiler2.default(this, filename, data).parse(text);
+    evaluateString(text, data, filename) {
+        return _srcTemplate2.default.fromString(this, text, filename).evaluate(data);
     }
 
-    load(filename, data) {
-        return new _srcCompiler2.default(this, filename, data).load();
+    evaluateFile(filename, data) {
+        return _srcTemplate2.default.fromFile(this, filename).evaluate(data);
+    }
+
+    compileString(text, filename) {
+        return _srcTemplate2.default.fromString(this, text, filename).compile();
+    }
+
+    compileFile(filename) {
+        return _srcTemplate2.default.fromFile(this, filename).compile();
     }
 }
 

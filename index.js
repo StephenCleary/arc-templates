@@ -10,12 +10,20 @@ class Arc {
         this.escape = escape || _.escape;
     }
 
-    parse(text, data, filename) {
+    evaluateString(text, data, filename) {
         return Template.fromString(this, text, filename).evaluate(data);
     }
 
-    load(filename, data) {
+    evaluateFile(filename, data) {
         return Template.fromFile(this, filename).evaluate(data);
+    }
+
+    compileString(text, filename) {
+        return Template.fromString(this, text, filename).compile();
+    }
+
+    compileFile(filename) {
+        return Template.fromFile(this, filename).compile();
     }
 }
 

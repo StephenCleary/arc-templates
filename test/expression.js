@@ -5,7 +5,7 @@ describe('expression', () => {
     describe('basic expression', () => {
         it('should return evaluated expression as the content', () => {
             const engine = new Arc();
-            return engine.parse('${value}', { value: 'test' }).then(result => {
+            return engine.evaluateString('${value}', { value: 'test' }).then(result => {
                 assert.equal(result.content, 'test');
             });
         });
@@ -14,7 +14,7 @@ describe('expression', () => {
     describe('quoted expression', () => {
         it('should return evaluated string as the content', () => {
             const engine = new Arc();
-            return engine.parse('${"wha"}').then(result => {
+            return engine.evaluateString('${"wha"}').then(result => {
                 assert.equal(result.content, 'wha');
             });
         });
@@ -23,7 +23,7 @@ describe('expression', () => {
     describe('html expression', () => {
         it('should return escaped string as the content', () => {
             const engine = new Arc();
-            return engine.parse('${value}', { value: '<div>'}).then(result => {
+            return engine.evaluateString('${value}', { value: '<div>'}).then(result => {
                 assert.equal(result.content, '&lt;div&gt;');
             });
         });
@@ -32,7 +32,7 @@ describe('expression', () => {
     describe('raw html expression', () => {
         it('should return unescaped string as the content', () => {
             const engine = new Arc();
-            return engine.parse('${raw(value)}', { value: '<div>'}).then(result => {
+            return engine.evaluateString('${raw(value)}', { value: '<div>'}).then(result => {
                 assert.equal(result.content, '<div>');
             });
         });
@@ -41,7 +41,7 @@ describe('expression', () => {
     describe('expression within document', () => {
         it('should merge evaluated expression with document text', () => {
             const engine = new Arc();
-            return engine.parse('pre${ inject } post', { inject: 'word'}).then(result => {
+            return engine.evaluateString('pre${ inject } post', { inject: 'word'}).then(result => {
                 assert.equal(result.content, 'preword post');
             });
         });
@@ -50,7 +50,7 @@ describe('expression', () => {
     describe('missing end brace', () => {
         it('should throw error', () => {
             const engine = new Arc();
-            return Promise.resolve().then(() => engine.parse('${value')).then(assert.fail,
+            return Promise.resolve().then(() => engine.evaluateString('${value')).then(assert.fail,
                     err => assert(/^<string> \(1,3\): /.test(err.message), err.message));
         });
     });
@@ -58,7 +58,7 @@ describe('expression', () => {
     describe('empty', () => {
         it('should throw error', () => {
             const engine = new Arc();
-            return Promise.resolve().then(() => engine.parse('${}')).then(assert.fail,
+            return Promise.resolve().then(() => engine.evaluateString('${}')).then(assert.fail,
                     err => assert(/^<string> \(1,3\): /.test(err.message), err.message));
         });
     });
@@ -66,7 +66,7 @@ describe('expression', () => {
     describe('contains end brace', () => {
         it('should throw error', () => {
             const engine = new Arc();
-            return Promise.resolve().then(() => engine.parse('${ "test of }" }')).then(assert.fail,
+            return Promise.resolve().then(() => engine.evaluateString('${ "test of }" }')).then(assert.fail,
                     err => assert(err instanceof SyntaxError, err.message));
         });
     });
@@ -74,7 +74,7 @@ describe('expression', () => {
     describe('identifiers', () => {
         it('_', () => {
             const engine = new Arc();
-            return engine.parse('${ _.range(1)[0] }').then(result => {
+            return engine.evaluateString('${ _.range(1)[0] }').then(result => {
                 assert.equal(result.content, '0');
             });
         });
