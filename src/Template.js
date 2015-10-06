@@ -2,9 +2,14 @@ import Lexer from './Lexer';
 import Context from './Context';
 import tokens from './tokens';
 import Promise from 'bluebird';
+import { transform } from 'babel-core';
 
 const MISSING_FILENAME = '<string>';
 const globalEval = eval;
+
+function transformAndEval(code) {
+    return globalEval(transform(code, { blacklist: ['strict'] }).code);
+}
 
 function nameOrExpression(token, defaultIfEmpty) {
     let value = token.value.trim();
@@ -20,37 +25,36 @@ function nameOrExpression(token, defaultIfEmpty) {
 
 function compile(text, filename) {
     const lexer = new Lexer(text, filename);
-    const buffer = ['with (this._locals) with (this.data) {\n'];
+    const buffer = [];
     for (let token of lexer.lex()) {
         switch (token.token) {
             case tokens.DOCUMENT:
-                buffer.push('this._appendRaw(' + JSON.stringify(token.value) + ');\n');
+                buffer.push('this._appendRaw(' + JSON.stringify(token.value) + ');');
                 break;
             case tokens.EXPRESSION:
-                buffer.push('this._append(' + token.value + ');\n');
+                buffer.push('this._append(' + token.value + ');');
                 break;
             case tokens.JAVASCRIPT:
-                buffer.push(token.value + ';\n');
+                buffer.push(token.value + ';');
                 break;
             case tokens.LAYOUT:
-                buffer.push('this._layout = ' + nameOrExpression(token) + ';\n');
+                buffer.push('this._layout = ' + nameOrExpression(token) + ';');
                 break;
             case tokens.BLOCK_REFERENCE:
-                buffer.push('this._appendRaw(this.child[' + nameOrExpression(token, 'content') + '] || "");\n');
+                buffer.push('this._appendRaw(this.child[' + nameOrExpression(token, 'content') + '] || "");');
                 break;
             case tokens.BLOCK_NAME:
-                buffer.push('this._currentBlock = ' + nameOrExpression(token) + ';\n');
+                buffer.push('this._currentBlock = ' + nameOrExpression(token) + ';');
                 break;
             case tokens.PARTIAL:
-                buffer.push('this.partial = this._locals.partial = yield this._partial(' + nameOrExpression(token) + ');\n');
-                buffer.push('this._appendRaw(this._locals.partial.content);\n');
+                buffer.push('this.partial = this._locals.partial = yield this._partial(' + nameOrExpression(token) + ');');
+                buffer.push('this._appendRaw(this._locals.partial.content);');
                 break;
             default:
                 throw new Error("Internal error.");
         }
     }
-    buffer.push('}');
-    return buffer.join('');
+    return buffer.join('\n');
 }
 
 class Template {
@@ -75,8 +79,9 @@ class Template {
 
     compile() {
         return this.load().then(text => {
-            // As much as I dislike eval, GeneratorFunction doesn't seem to be working yet.
-            const func = globalEval('(function *() { ' + compile(text, this.filename) + ' })');
+            // As much as I dislike eval, GeneratorFunction.constructor isn't working yet for Node *or* Babel.
+            // The awkward extra function wrapper is required because Babel does not yet support 'with' statements within generator functions.
+            const func = transformAndEval('(function () { with (this._locals) with (this.data) { return (function *() {\n' + compile(text, this.filename) + '\n}); } })');
             const context = new Context(this, func, this.filename);
             return context._execute.bind(context);
         });

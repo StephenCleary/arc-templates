@@ -45,11 +45,15 @@ var RawString = (function () {
 
 var Context = (function () {
     function Context(template, evaluate, filename) {
+        var _this = this;
+
         _classCallCheck(this, Context);
 
         this._ = _lodash2['default'];
         this._template = template;
-        this._evaluate = _bluebird2['default'].coroutine(evaluate);
+        this._evaluate = function () {
+            return _bluebird2['default'].coroutine(evaluate.call(_this)).call(_this);
+        };
         this._filename = filename;
         this._locals = {
             _: this._,
@@ -60,7 +64,7 @@ var Context = (function () {
     _createClass(Context, [{
         key: '_execute',
         value: function _execute(data, child) {
-            var _this = this;
+            var _this2 = this;
 
             this._result = {
                 content: ''
@@ -69,10 +73,10 @@ var Context = (function () {
             this.data = data || {};
             this.child = this._locals.child = child;
             return this._evaluate().then(function () {
-                if (_this._layout === undefined) {
-                    return _this._result;
+                if (_this2._layout === undefined) {
+                    return _this2._result;
                 }
-                return _Template2['default'].fromFile(_this._template.arc, _this._template.joinedPath(_this._layout)).evaluate(_this.data, _this._result);
+                return _Template2['default'].fromFile(_this2._template.arc, _this2._template.joinedPath(_this2._layout)).evaluate(_this2.data, _this2._result);
             });
         }
     }, {

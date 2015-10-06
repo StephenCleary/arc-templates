@@ -28,8 +28,14 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
+var _babelCore = require('babel-core');
+
 var MISSING_FILENAME = '<string>';
 var globalEval = eval;
+
+function transformAndEval(code) {
+    return globalEval((0, _babelCore.transform)(code, { blacklist: ['strict'] }).code);
+}
 
 function nameOrExpression(token, defaultIfEmpty) {
     var value = token.value.trim();
@@ -45,7 +51,7 @@ function nameOrExpression(token, defaultIfEmpty) {
 
 function _compile(text, filename) {
     var lexer = new _Lexer2['default'](text, filename);
-    var buffer = ['with (this._locals) with (this.data) {\n'];
+    var buffer = [];
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
     var _iteratorError = undefined;
@@ -56,26 +62,26 @@ function _compile(text, filename) {
 
             switch (token.token) {
                 case _tokens2['default'].DOCUMENT:
-                    buffer.push('this._appendRaw(' + JSON.stringify(token.value) + ');\n');
+                    buffer.push('this._appendRaw(' + JSON.stringify(token.value) + ');');
                     break;
                 case _tokens2['default'].EXPRESSION:
-                    buffer.push('this._append(' + token.value + ');\n');
+                    buffer.push('this._append(' + token.value + ');');
                     break;
                 case _tokens2['default'].JAVASCRIPT:
-                    buffer.push(token.value + ';\n');
+                    buffer.push(token.value + ';');
                     break;
                 case _tokens2['default'].LAYOUT:
-                    buffer.push('this._layout = ' + nameOrExpression(token) + ';\n');
+                    buffer.push('this._layout = ' + nameOrExpression(token) + ';');
                     break;
                 case _tokens2['default'].BLOCK_REFERENCE:
-                    buffer.push('this._appendRaw(this.child[' + nameOrExpression(token, 'content') + '] || "");\n');
+                    buffer.push('this._appendRaw(this.child[' + nameOrExpression(token, 'content') + '] || "");');
                     break;
                 case _tokens2['default'].BLOCK_NAME:
-                    buffer.push('this._currentBlock = ' + nameOrExpression(token) + ';\n');
+                    buffer.push('this._currentBlock = ' + nameOrExpression(token) + ';');
                     break;
                 case _tokens2['default'].PARTIAL:
-                    buffer.push('this.partial = this._locals.partial = yield this._partial(' + nameOrExpression(token) + ');\n');
-                    buffer.push('this._appendRaw(this._locals.partial.content);\n');
+                    buffer.push('this.partial = this._locals.partial = yield this._partial(' + nameOrExpression(token) + ');');
+                    buffer.push('this._appendRaw(this._locals.partial.content);');
                     break;
                 default:
                     throw new Error("Internal error.");
@@ -96,8 +102,7 @@ function _compile(text, filename) {
         }
     }
 
-    buffer.push('}');
-    return buffer.join('');
+    return buffer.join('\n');
 }
 
 var Template = (function () {
@@ -126,8 +131,9 @@ var Template = (function () {
             var _this2 = this;
 
             return this.load().then(function (text) {
-                // As much as I dislike eval, GeneratorFunction doesn't seem to be working yet.
-                var func = globalEval('(function *() { ' + _compile(text, _this2.filename) + ' })');
+                // As much as I dislike eval, GeneratorFunction.constructor isn't working yet for Node *or* Babel.
+                // The awkward extra function wrapper is required because Babel does not yet support 'with' statements within generator functions.
+                var func = transformAndEval('(function () { with (this._locals) with (this.data) { return (function *() {\n' + _compile(text, _this2.filename) + '\n}); } })');
                 var context = new _Context2['default'](_this2, func, _this2.filename);
                 return context._execute.bind(context);
             });
