@@ -1,3 +1,4 @@
+import 'babel-core/polyfill';
 import _ from 'lodash';
 import Template from './src/Template';
 import NodeFilesystem from './src/NodeFilesystem';

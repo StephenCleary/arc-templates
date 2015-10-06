@@ -10,6 +10,8 @@ Object.defineProperty(exports, '__esModule', {
     value: true
 });
 
+require('babel-core/polyfill');
+
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
