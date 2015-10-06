@@ -51,9 +51,9 @@ var Context = (function () {
 
         this._ = _lodash2['default'];
         this._template = template;
-        this._evaluate = function () {
+        this._evaluate = template.arc.supportES5 ? function () {
             return _bluebird2['default'].coroutine(evaluate.call(_this)).call(_this);
-        };
+        } : _bluebird2['default'].coroutine(evaluate);
         this._filename = filename;
         this._locals = {
             _: this._,

@@ -1,30 +1,35 @@
-import 'babel-core/polyfill';
 import _ from 'lodash';
 import Template from './src/Template';
 import NodeFilesystem from './src/NodeFilesystem';
 import NodePath from './src/NodePath';
+import semver from 'semver';
+
+const supportES5 = semver.lt(process.versions.node, '4.0.0');
+const preload = supportES5 ? System.import('babel-core/polyfill') : Promise.resolve();
 
 class Arc {
-    constructor(filesystem, pathsystem, escape) {
-        this.filesystem = filesystem || new NodeFilesystem();
-        this.path = pathsystem || new NodePath();
-        this.escape = escape || _.escape;
+    constructor(options) {
+        options = options || {};
+        this.filesystem = options.filesystem || new NodeFilesystem();
+        this.path = options.pathsystem || new NodePath();
+        this.escape = options.escape || _.escape;
+        this.supportES5 = supportES5;
     }
 
     evaluateString(text, data, filename) {
-        return Template.fromString(this, text, filename).evaluate(data);
+        return preload.then(() => Template.fromString(this, text, filename).evaluate(data));
     }
 
     evaluateFile(filename, data) {
-        return Template.fromFile(this, filename).evaluate(data);
+        return preload.then(() => Template.fromFile(this, filename).evaluate(data));
     }
 
     compileString(text, filename) {
-        return Template.fromString(this, text, filename).compile();
+        return preload.then(() => Template.fromString(this, text, filename).compile());
     }
 
     compileFile(filename) {
-        return Template.fromFile(this, filename).compile();
+        return preload.then(() => Template.fromFile(this, filename).compile());
     }
 }
 

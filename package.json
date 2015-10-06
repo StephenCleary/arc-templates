@@ -1,6 +1,6 @@
 {
   "name": "arc-templates",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/StephenCleary/arc-templates"
@@ -32,7 +32,8 @@
     "bluebird": "^2.10.1",
     "fs": "0.0.2",
     "lodash": "^3.10.1",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "semver": "^5.0.3"
   },
   "engines": {
     "node": ">=4"

@@ -11,7 +11,7 @@ describe('partial', () => {
                     return 'test';
                 })
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<( ' + name + ' )>').then(result => {
                 assert.equal(result.content, 'test');
             });
@@ -31,7 +31,7 @@ describe('partial', () => {
                     }
                 })
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateFile('pages/mypage.html').then(result => {
                 assert.equal(result.content, 'made it!');
             });
@@ -41,7 +41,7 @@ describe('partial', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('${ west }')
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<( myinclude.html )>', {west: 'yes'}).then(result => {
                 assert.equal(result.content, 'yes');
             });
@@ -51,7 +51,7 @@ describe('partial', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('${ test }')
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<% this.data.test = "jitters"; %><( myinclude.html )>').then(result => {
                 assert.equal(result.content, 'jitters');
             });
@@ -63,7 +63,7 @@ describe('partial', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('<[ bob <:hi:> ]>')
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<( myinclude.html )>${ partial.bob }').then(result => {
                 assert.equal(result.content, 'hi');
             });
@@ -78,7 +78,7 @@ describe('partial', () => {
                     return 'test';
                 })
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<( ("my" + "include" + ext) )>', { ext: '.html' }).then(result => {
                 assert.equal(result.content, 'test');
             });

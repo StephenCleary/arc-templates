@@ -11,7 +11,7 @@ describe('layout', () => {
                     return 'test';
                 })
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<! ' + name + ' !>').then(result => {
                 assert.equal(result.content, 'test');
             });
@@ -31,7 +31,7 @@ describe('layout', () => {
                     }
                 })
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateFile('pages/mypage.html').then(result => {
                 assert.equal(result.content, 'made it!');
             });
@@ -41,7 +41,7 @@ describe('layout', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('${ west }')
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<! mylayout.html !>', {west: 'yes'}).then(result => {
                 assert.equal(result.content, 'yes');
             });
@@ -51,7 +51,7 @@ describe('layout', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('<* content *> container')
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<! mylayout.html !> woot').then(result => {
                 assert.equal(result.content, ' woot container');
             });
@@ -61,7 +61,7 @@ describe('layout', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('${ test }')
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<! mylayout.html !> <% this.data.test = "jitters"; %>').then(result => {
                 assert.equal(result.content, 'jitters');
             });
@@ -73,7 +73,7 @@ describe('layout', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('<* *>')
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<! mylayout.html !> woot').then(result => {
                 assert.equal(result.content, ' woot');
             });
@@ -83,7 +83,7 @@ describe('layout', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('<**>')
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<! mylayout.html !> woot').then(result => {
                 assert.equal(result.content, ' woot');
             });
@@ -93,7 +93,7 @@ describe('layout', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('<* bob *>')
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<! mylayout.html !> woot <[ bob <: data :> ]>').then(result => {
                 assert.equal(result.content, ' data ');
             });
@@ -103,7 +103,7 @@ describe('layout', () => {
             const filesystem = {
                 readFile: filename => Promise.resolve('<* bob *><**>')
             };
-            const engine = new Arc(filesystem);
+            const engine = new Arc({ filesystem });
             return engine.evaluateString('<! mylayout.html !> woot').then(result => {
                 assert.equal(result.content, ' woot');
             });
@@ -117,7 +117,7 @@ describe('layout', () => {
                         return 'test';
                     })
                 };
-                const engine = new Arc(filesystem);
+                const engine = new Arc({ filesystem });
                 return engine.evaluateString('<! ("my" + "template" + ext) !>', { ext: '.html' }).then(result => {
                     assert.equal(result.content, 'test');
                 });

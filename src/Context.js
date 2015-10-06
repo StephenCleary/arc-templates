@@ -19,7 +19,9 @@ class Context {
     constructor(template, evaluate, filename) {
         this._ = _;
         this._template = template;
-        this._evaluate = () => Promise.coroutine(evaluate.call(this)).call(this);
+        this._evaluate = template.arc.supportES5 ?
+            () => Promise.coroutine(evaluate.call(this)).call(this) :
+            Promise.coroutine(evaluate);
         this._filename = filename;
         this._locals = {
             _: this._,

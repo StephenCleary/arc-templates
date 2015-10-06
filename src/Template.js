@@ -7,10 +7,6 @@ import { transform } from 'babel-core';
 const MISSING_FILENAME = '<string>';
 const globalEval = eval;
 
-function transformAndEval(code) {
-    return globalEval(transform(code, { blacklist: ['strict'] }).code);
-}
-
 function nameOrExpression(token, defaultIfEmpty) {
     let value = token.value.trim();
     if (value === '') {
@@ -80,8 +76,13 @@ class Template {
     compile() {
         return this.load().then(text => {
             // As much as I dislike eval, GeneratorFunction.constructor isn't working yet for Node *or* Babel.
-            // The awkward extra function wrapper is required because Babel does not yet support 'with' statements within generator functions.
-            const func = transformAndEval('(function () { with (this._locals) with (this.data) { return (function *() {\n' + compile(text, this.filename) + '\n}); } })');
+            // The awkward extra function wrapper for ES5 is required because Babel does not yet support 'with' statements within generator functions.
+            const funcText = this.arc.supportES5 ?
+                '(function () { with (this._locals) with (this.data) { return (function *() {\n' + compile(text, this.filename) + '\n}).bind(this); } })' :
+                '(function *() { with (this._locals) with (this.data) {\n' + compile(text, this.filename) + '\n} })';
+            const func = this.arc.supportES5 ?
+                globalEval(transform(funcText, { blacklist: ['strict'] }).code) :
+                globalEval(funcText);
             const context = new Context(this, func, this.filename);
             return context._execute.bind(context);
         });
