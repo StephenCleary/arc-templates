@@ -5,7 +5,7 @@ import NodePath from './src/NodePath';
 import semver from 'semver';
 
 const supportES5 = semver.lt(process.versions.node, '4.0.0');
-const preload = supportES5 ? System.import('babel-core/polyfill') : Promise.resolve();
+const preload = supportES5 ? Promise.resolve(require('babel-core/polyfill')) : Promise.resolve();
 
 class Arc {
     constructor(options) {
