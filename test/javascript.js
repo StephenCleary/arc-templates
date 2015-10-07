@@ -50,6 +50,15 @@ describe('javascript', () => {
         });
     });
 
+    describe('for-let-of block', () => {
+        it('evaluates content', () => {
+            const engine = new Arc();
+            return engine.evaluateString('<% for (let e of array) { <: <div>${e}</div> :> } %>', { array: ['a', 'b', 13]}).then(result => {
+                assert.equal(result.content, ' <div>a</div>  <div>b</div>  <div>13</div> ');
+            });
+        });
+    });
+
     describe('variable declaration', () => {
         it('is available in later expressions', () => {
             const engine = new Arc();
