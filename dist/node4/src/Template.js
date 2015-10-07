@@ -96,7 +96,7 @@ class Template {
             // As much as I dislike eval, GeneratorFunction.constructor isn't working yet for Node *or* Babel.
             // The awkward extra function wrapper for ES5 is required because Babel does not yet support 'with' statements within generator functions.
             const funcText = this.arc.supportES5 ? '(function () { with (this._locals) with (this.data) { return (function *() {\n' + compile(text, this.filename) + '\n}).bind(this); } })' : '(function *() { with (this._locals) with (this.data) {\n' + compile(text, this.filename) + '\n} })';
-            const func = this.arc.supportES5 ? globalEval(require('babel-core').transform(funcText, { blacklist: ['strict'], optional: ['runtime'] }).code) : globalEval(funcText);
+            const func = this.arc.supportES5 ? globalEval(require('babel-core').transform(funcText, { blacklist: ['strict'] }).code) : globalEval(funcText);
             const context = new _Context2.default(this, func, this.filename);
             return context._execute.bind(context);
         });
