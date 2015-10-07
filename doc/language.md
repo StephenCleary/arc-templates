@@ -10,7 +10,7 @@ JavaScript blocks start with `<%` and end with `%>`.
 
 Many blocks are used to iterate over a collection of values. This is most naturally done with a nested [document block](document.md).
 
-    <% for (var item of items) { <:<div>${ item }</div>:> } %>
+    <% for (let item of items) { <:<div>${ item }</div>:> } %>
     
 with a data object of `{ items: ['x', 'y'] }` will result in:
 
@@ -18,7 +18,7 @@ with a data object of `{ items: ['x', 'y'] }` will result in:
 
 This same operation can also be written with multiple JavaScript blocks instead of a nested document block; the following code produces the same output:
 
-    <% for (var item of items) { %><div>${ item }</div><% } %>
+    <% for (let item of items) { %><div>${ item }</div><% } %>
 
 ## Children
 

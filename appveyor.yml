@@ -1,8 +1,0 @@
-version: 0.1.0.{build}
-install:
-- ps: Update-NodeJsInstallation (Get-NodeJsLatestBuild 4.1)
-- npm install gulp --global --no-optional --silent
-- npm install --no-optional --silent
-build: off
-test_script:
-- gulp

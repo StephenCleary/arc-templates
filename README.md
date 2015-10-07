@@ -1,11 +1,11 @@
 # arc-templates
 Fully powered ES6 JavaScript template engine with halfway-decent syntax.
 
-[![GitHub version](https://badge.fury.io/gh/StephenCleary%2Farc-templates.svg)](http://badge.fury.io/gh/StephenCleary%2Farc-templates) [![Build status (lint + tests)](https://ci.appveyor.com/api/projects/status/teog37781ort2vhg?svg=true)](https://ci.appveyor.com/project/StephenCleary/arc-templates)
+[![GitHub version](https://badge.fury.io/gh/StephenCleary%2Farc-templates.svg)](http://badge.fury.io/gh/StephenCleary%2Farc-templates) [![Build Status (lint + tests)](https://travis-ci.org/StephenCleary/arc-templates.svg?branch=master)](https://travis-ci.org/StephenCleary/arc-templates)
 
 [![Dependency Status](https://david-dm.org/StephenCleary/arc-templates.svg)](https://david-dm.org/StephenCleary/arc-templates) [![devDependency Status](https://david-dm.org/StephenCleary/arc-templates/dev-status.svg)](https://david-dm.org/StephenCleary/arc-templates#info=devDependencies)
 
-There are two "builds" available: a Node.js 4+ version with minimal Babel transpiling, and an ES5 version with full Babel transpiling. The unit tests are run on the latest Node.js version, using minimal transpiling.
+There are two "builds" available: a Node.js 4+ version with minimal Babel transpiling, and an ES5 version with full Babel transpiling. The unit tests are run on both new and older Node versions.
 
 # Simple example
 
@@ -21,7 +21,7 @@ with a data object of `{ name: 'world' }` will result in:
 
 [JavaScript blocks](doc/language.md) with nested [document blocks](doc/document.md) allow a natural expression of loops:
 
-    <% for (var item of items) { <:<div>${item}</div>:> } %>
+    <% for (let item of items) { <:<div>${item}</div>:> } %>
     
 # Layouts
 
