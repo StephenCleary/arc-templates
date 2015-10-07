@@ -36,7 +36,7 @@ gulp.task('compile-es5-src', function () {
 gulp.task('compile-node4-index', function () {
     return gulp.src(['index.js'])
         .pipe(sourcemaps.init())
-        .pipe(babel({ optional: ['runtime'] }))
+        .pipe(babel({ babelrc: 'node4.babelrc' }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('dist/node4'));
 });
@@ -44,7 +44,7 @@ gulp.task('compile-node4-index', function () {
 gulp.task('compile-node4-src', function () {
     return gulp.src(['src/**/*.js'])
         .pipe(sourcemaps.init())
-        .pipe(babel({ optional: ['runtime'] }))
+        .pipe(babel({ babelrc: 'node4.babelrc' }))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('dist/node4/src'));
 });

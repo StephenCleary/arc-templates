@@ -33,7 +33,7 @@ var _semver = require('semver');
 var _semver2 = _interopRequireDefault(_semver);
 
 var supportES5 = _semver2['default'].lt(process.versions.node, '4.0.0');
-var preload = supportES5 ? System['import']('babel-core/polyfill') : _Promise.resolve();
+var preload = supportES5 ? _Promise.resolve(require('babel-core/polyfill')) : _Promise.resolve();
 
 var Arc = (function () {
     function Arc(options) {

@@ -1,16 +1,10 @@
 'use strict';
 
-var _createClass = require('babel-runtime/helpers/create-class')['default'];
-
-var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
-
-var _Promise = require('babel-runtime/core-js/promise')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
 Object.defineProperty(exports, '__esModule', {
     value: true
 });
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _lodash = require('lodash');
 
@@ -32,61 +26,35 @@ var _semver = require('semver');
 
 var _semver2 = _interopRequireDefault(_semver);
 
-var supportES5 = _semver2['default'].lt(process.versions.node, '4.0.0');
-var preload = supportES5 ? System['import']('babel-core/polyfill') : _Promise.resolve();
+const supportES5 = _semver2.default.lt(process.versions.node, '4.0.0');
+const preload = supportES5 ? Promise.resolve(require('babel-core/polyfill')) : Promise.resolve();
 
-var Arc = (function () {
-    function Arc(options) {
-        _classCallCheck(this, Arc);
-
+class Arc {
+    constructor(options) {
         options = options || {};
-        this.filesystem = options.filesystem || new _srcNodeFilesystem2['default']();
-        this.path = options.pathsystem || new _srcNodePath2['default']();
-        this.escape = options.escape || _lodash2['default'].escape;
+        this.filesystem = options.filesystem || new _srcNodeFilesystem2.default();
+        this.path = options.pathsystem || new _srcNodePath2.default();
+        this.escape = options.escape || _lodash2.default.escape;
         this.supportES5 = supportES5;
     }
 
-    _createClass(Arc, [{
-        key: 'evaluateString',
-        value: function evaluateString(text, data, filename) {
-            var _this = this;
+    evaluateString(text, data, filename) {
+        return preload.then(() => _srcTemplate2.default.fromString(this, text, filename).evaluate(data));
+    }
 
-            return preload.then(function () {
-                return _srcTemplate2['default'].fromString(_this, text, filename).evaluate(data);
-            });
-        }
-    }, {
-        key: 'evaluateFile',
-        value: function evaluateFile(filename, data) {
-            var _this2 = this;
+    evaluateFile(filename, data) {
+        return preload.then(() => _srcTemplate2.default.fromFile(this, filename).evaluate(data));
+    }
 
-            return preload.then(function () {
-                return _srcTemplate2['default'].fromFile(_this2, filename).evaluate(data);
-            });
-        }
-    }, {
-        key: 'compileString',
-        value: function compileString(text, filename) {
-            var _this3 = this;
+    compileString(text, filename) {
+        return preload.then(() => _srcTemplate2.default.fromString(this, text, filename).compile());
+    }
 
-            return preload.then(function () {
-                return _srcTemplate2['default'].fromString(_this3, text, filename).compile();
-            });
-        }
-    }, {
-        key: 'compileFile',
-        value: function compileFile(filename) {
-            var _this4 = this;
+    compileFile(filename) {
+        return preload.then(() => _srcTemplate2.default.fromFile(this, filename).compile());
+    }
+}
 
-            return preload.then(function () {
-                return _srcTemplate2['default'].fromFile(_this4, filename).compile();
-            });
-        }
-    }]);
-
-    return Arc;
-})();
-
-exports['default'] = Arc;
-module.exports = exports['default'];
+exports.default = Arc;
+module.exports = exports.default;
 //# sourceMappingURL=index.js.map

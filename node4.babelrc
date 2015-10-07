@@ -4,5 +4,8 @@
     "strict",
     "es6.parameters",
     "es6.spread"
+  ],
+  "optional": [
+    "runtime"
   ]
 }

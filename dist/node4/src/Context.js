@@ -1,14 +1,10 @@
 'use strict';
 
-var _createClass = require('babel-runtime/helpers/create-class')['default'];
-
-var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
 Object.defineProperty(exports, '__esModule', {
     value: true
 });
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _lodash = require('lodash');
 
@@ -22,38 +18,24 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
-var RawString = (function () {
-    function RawString(value) {
-        _classCallCheck(this, RawString);
-
+class RawString {
+    constructor(value) {
         this.value = value;
     }
 
-    /**
-     * The context in which a template executes.
-     */
+    toString() {
+        return this.value;
+    }
+}
 
-    _createClass(RawString, [{
-        key: 'toString',
-        value: function toString() {
-            return this.value;
-        }
-    }]);
-
-    return RawString;
-})();
-
-var Context = (function () {
-    function Context(template, evaluate, filename) {
-        var _this = this;
-
-        _classCallCheck(this, Context);
-
-        this._ = _lodash2['default'];
+/**
+ * The context in which a template executes.
+ */
+class Context {
+    constructor(template, evaluate, filename) {
+        this._ = _lodash2.default;
         this._template = template;
-        this._evaluate = template.arc.supportES5 ? function () {
-            return _bluebird2['default'].coroutine(evaluate.call(_this)).call(_this);
-        } : _bluebird2['default'].coroutine(evaluate);
+        this._evaluate = template.arc.supportES5 ? () => _bluebird2.default.coroutine(evaluate.call(this)).call(this) : _bluebird2.default.coroutine(evaluate);
         this._filename = filename;
         this._locals = {
             _: this._,
@@ -61,57 +43,46 @@ var Context = (function () {
         };
     }
 
-    _createClass(Context, [{
-        key: '_execute',
-        value: function _execute(data, child) {
-            var _this2 = this;
-
-            this._result = {
-                content: ''
-            };
-            this._currentBlock = 'content';
-            this.data = data || {};
-            this.child = this._locals.child = child;
-            return this._evaluate().then(function () {
-                if (_this2._layout === undefined) {
-                    return _this2._result;
-                }
-                return _Template2['default'].fromFile(_this2._template.arc, _this2._template.joinedPath(_this2._layout)).evaluate(_this2.data, _this2._result);
-            });
-        }
-    }, {
-        key: '_appendRaw',
-        value: function _appendRaw(str) {
-            if (this._result[this._currentBlock] === undefined) {
-                this._result[this._currentBlock] = str;
-            } else {
-                this._result[this._currentBlock] += str;
+    _execute(data, child) {
+        this._result = {
+            content: ''
+        };
+        this._currentBlock = 'content';
+        this.data = data || {};
+        this.child = this._locals.child = child;
+        return this._evaluate().then(() => {
+            if (this._layout === undefined) {
+                return this._result;
             }
-        }
-    }, {
-        key: '_append',
-        value: function _append(str) {
-            if (str instanceof RawString) {
-                this._appendRaw(str);
-            } else {
-                this._appendRaw(this._template.arc.escape(str));
-            }
-        }
-    }, {
-        key: 'raw',
-        value: function raw(str) {
-            return new RawString(str);
-        }
-    }, {
-        key: '_partial',
-        value: function _partial(path) {
-            return _Template2['default'].fromFile(this._template.arc, this._template.joinedPath(path)).evaluate(this.data);
-        }
-    }]);
+            return _Template2.default.fromFile(this._template.arc, this._template.joinedPath(this._layout)).evaluate(this.data, this._result);
+        });
+    }
 
-    return Context;
-})();
+    _appendRaw(str) {
+        if (this._result[this._currentBlock] === undefined) {
+            this._result[this._currentBlock] = str;
+        } else {
+            this._result[this._currentBlock] += str;
+        }
+    }
 
-exports['default'] = Context;
-module.exports = exports['default'];
+    _append(str) {
+        if (str instanceof RawString) {
+            this._appendRaw(str);
+        } else {
+            this._appendRaw(this._template.arc.escape(str));
+        }
+    }
+
+    raw(str) {
+        return new RawString(str);
+    }
+
+    _partial(path) {
+        return _Template2.default.fromFile(this._template.arc, this._template.joinedPath(path)).evaluate(this.data);
+    }
+}
+
+exports.default = Context;
+module.exports = exports.default;
 //# sourceMappingURL=Context.js.map

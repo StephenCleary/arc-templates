@@ -2,7 +2,6 @@ import Lexer from './Lexer';
 import Context from './Context';
 import tokens from './tokens';
 import Promise from 'bluebird';
-import { transform } from 'babel-core';
 
 const MISSING_FILENAME = '<string>';
 const globalEval = eval;
@@ -81,7 +80,7 @@ class Template {
                 '(function () { with (this._locals) with (this.data) { return (function *() {\n' + compile(text, this.filename) + '\n}).bind(this); } })' :
                 '(function *() { with (this._locals) with (this.data) {\n' + compile(text, this.filename) + '\n} })';
             const func = this.arc.supportES5 ?
-                globalEval(transform(funcText, { blacklist: ['strict'] }).code) :
+                globalEval(require('babel-core').transform(funcText, { blacklist: ['strict'], optional: ['runtime'] }).code) :
                 globalEval(funcText);
             const context = new Context(this, func, this.filename);
             return context._execute.bind(context);

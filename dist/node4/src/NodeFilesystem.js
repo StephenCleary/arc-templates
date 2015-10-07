@@ -1,14 +1,10 @@
 'use strict';
 
-var _createClass = require('babel-runtime/helpers/create-class')['default'];
-
-var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
 Object.defineProperty(exports, '__esModule', {
     value: true
 });
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _fs = require('fs');
 
@@ -18,23 +14,14 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
-var readFileAsync = _bluebird2['default'].promisify(_fs2['default'].readFile);
+const readFileAsync = _bluebird2.default.promisify(_fs2.default.readFile);
 
-var NodeFilesystem = (function () {
-    function NodeFilesystem() {
-        _classCallCheck(this, NodeFilesystem);
+class NodeFilesystem {
+    readFile(path) {
+        return readFileAsync(path, 'utf8');
     }
+}
 
-    _createClass(NodeFilesystem, [{
-        key: 'readFile',
-        value: function readFile(path) {
-            return readFileAsync(path, 'utf8');
-        }
-    }]);
-
-    return NodeFilesystem;
-})();
-
-exports['default'] = NodeFilesystem;
-module.exports = exports['default'];
+exports.default = NodeFilesystem;
+module.exports = exports.default;
 //# sourceMappingURL=NodeFilesystem.js.map
