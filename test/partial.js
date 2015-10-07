@@ -79,7 +79,7 @@ describe('partial', () => {
                 })
             };
             const engine = new Arc({ filesystem });
-            return engine.evaluateString('<( ("my" + "include" + ext) )>', { ext: '.html' }).then(result => {
+            return engine.evaluateString('<( ("my" + `include` + ext) )>', { ext: '.html' }).then(result => {
                 assert.equal(result.content, 'test');
             });
         });

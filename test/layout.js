@@ -118,7 +118,7 @@ describe('layout', () => {
                     })
                 };
                 const engine = new Arc({ filesystem });
-                return engine.evaluateString('<! ("my" + "template" + ext) !>', { ext: '.html' }).then(result => {
+                return engine.evaluateString('<! ("my" + `template` + ext) !>', { ext: '.html' }).then(result => {
                     assert.equal(result.content, 'test');
                 });
             });
