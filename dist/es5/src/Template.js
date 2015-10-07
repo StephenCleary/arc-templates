@@ -28,6 +28,8 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
+var _babelCore = require('babel-core');
+
 var MISSING_FILENAME = '<string>';
 var globalEval = eval;
 
@@ -126,9 +128,13 @@ var Template = (function () {
 
             return this.load().then(function (text) {
                 // As much as I dislike eval, GeneratorFunction.constructor isn't working yet for Node *or* Babel.
+
                 // The awkward extra function wrapper for ES5 is required because Babel does not yet support 'with' statements within generator functions.
                 var funcText = _this2.arc.supportES5 ? '(function () { with (this._locals) with (this.data) { return (function *() {\n' + _compile(text, _this2.filename) + '\n}).bind(this); } })' : '(function *() { with (this._locals) with (this.data) {\n' + _compile(text, _this2.filename) + '\n} })';
-                var func = _this2.arc.supportES5 ? globalEval(require('babel-core').transform(funcText, { blacklist: ['strict'] }).code) : globalEval(funcText);
+
+                // We also Babel-transform for modern Node versions because it doesn't yet support block scoping (const, let, etc) outside of strict mode (as of 2015-10-07).
+                // Ideally, for modern Node, this should just be: globalEval(funcText)
+                var func = _this2.arc.supportES5 ? globalEval((0, _babelCore.transform)(funcText, { blacklist: ['strict'] }).code) : globalEval((0, _babelCore.transform)(funcText, { whitelist: ['es6.blockScoping'] }).code);
                 var context = new _Context2['default'](_this2, func, _this2.filename);
                 return context._execute.bind(context);
             });
