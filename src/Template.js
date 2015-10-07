@@ -80,7 +80,7 @@ class Template {
                 '(function () { with (this._locals) with (this.data) { return (function *() {\n' + compile(text, this.filename) + '\n}).bind(this); } })' :
                 '(function *() { with (this._locals) with (this.data) {\n' + compile(text, this.filename) + '\n} })';
             const func = this.arc.supportES5 ?
-                globalEval(require('babel-core').transform(funcText, { blacklist: ['strict'], optional: ['runtime'] }).code) :
+                globalEval(require('babel-core').transform(funcText, { blacklist: ['strict'] }).code) :
                 globalEval(funcText);
             const context = new Context(this, func, this.filename);
             return context._execute.bind(context);
